@@ -42,7 +42,7 @@ Review this file in preparation for using some of the data in the next step.
 
 ### 3. Deploy VPN Gateway Stack
 
-In this step you'll create a CloudFormation stack using the `aws-vpn-gateway-strongswan.yml` template and configuration data obtained from the remote site's Site-to-Site VPN Connection resource.
+In this step you'll create a CloudFormation stack using the [`vpn-gateway-strongswan.yml`](./vpn-gateway-strongswan.yml) template and configuration data obtained from the remote site's Site-to-Site VPN Connection resource.
 
 * Use the CloudFormation template to deploy a VPN gateway stack in a public subnet based on the parameters described below.
 * Wait for creation of the stack to complete. Since the template uses a wait condition, the stack won't complete until strongSwan and other components have been configured and started.
