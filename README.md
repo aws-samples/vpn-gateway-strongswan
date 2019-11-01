@@ -4,6 +4,15 @@ CloudFormation template to deploy the open source [strongSwan VPN](https://www.s
 
 The open source [Quagga](https://en.wikipedia.org/wiki/Quagga_(software) ) software suite is used to provide [Border Gateway Protocol (BGP)](https://searchnetworking.techtarget.com/definition/BGP-Border-Gateway-Protocol) support to automatically propagate routing information across a site-to-site VPN connection.
 
+* [Use Cases](#use-cases)
+* [CloudFormation Features Demonstrated](#cloudformation-features-demonstrated)
+* [Usage](#usage)
+* [Parameters](#parameters)
+* [Troubleshooting](#troubleshooting)
+* [Advanced Usage](#advanced-usage)
+* [Contributing](#contributing)
+* [License](#license)
+
 ## Use Cases
 
 * **Demonstration and Lab Environments Representing On-Premises VPN Gateways:** This stack can be useful to help demonstrate how to integrate an on-premises VPN gateway with AWS networks via Virtual Private Gateways (VPGs) and Transit Gateways (TGWs).  
