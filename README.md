@@ -35,25 +35,25 @@ Even if you're not interested in deploying a VPN gateway, but you're interested 
 
 ### 1. Obtain Elastic IP Address
 
-Decoupling creation and management of the Elastic IP Address (EIP) from the creation and management of the VPN gateway is useful so that you can replace the VPN gateway stack at will without needing to reconfigure the remote end of the site-to-site VPN connection.  By preserving the local EIP and attaching to an replacement stack's EC2 instance, the remote end of the connection is unaffected.
+Decoupling the creation and management of the Elastic IP Address (EIP) from the creation and management of the VPN gateway enables you to replace the VPN gateway stack and associated EC2 instance without needing to reconfigure the remote end of the site-to-site VPN connection.
 
-Your first task is to use the following EIP template to create a new EIP that will be used in subsequent steps to help configure the remote end of the VPN connection and drive the configuration of the local VPN gateway stack:
+Create an EIP and obtain its allocation ID so that you can pass it as a parameter to the CloudFormation stack through which the VPN gateway will be created.  You can either create the EIP manually or use 
 
-[https://github.com/ckamps/infra-aws-elastic-ip](https://github.com/ckamps/infra-aws-elastic-ip)
+An example CloudFormation template:
 
-The VPN gateway template that you will be using in a subsequent step is configured to import an Elastic IP allocation ID from an EIP resource created via this EIP template:
+[`elastic-ip-address.yml`](./elastic-ip-address.yml)
 
-### 2. Arrive at VPN Tunnel Configuration Settings
+### 2. Determine VPN Tunnel Configuration Settings
 
-When using either AWS VPGs or TGWs for the remote end of the site-to-site VPN connection, a site-to-site VPN connection resource will be established in AWS on the remote site. Within the site-to-site VPN connection resource on the remote site, you can download a VPN configuration file that will provide you with much of the data required to deploy the local VPN gateway. See `VPC -> Site-to-Site VPN Connections`, select the connection of interest, click `Download` and select the `Generic` option for `Vendor` and download the configuration file.
+When using either AWS VPGs or TGWs for the remote end of the site-to-site VPN connection, a site-to-site VPN connection resource will be established in AWS on the remote site. Within the site-to-site VPN connection resource on the remote site, you can download a VPN configuration file that will provide you with much of the data required to deploy the local VPN gateway. In the AWS management console, see `VPC -> Site-to-Site VPN Connections`, select the connection of interest, click `Download` and select the `Generic` option for `Vendor` and download the configuration file.
 
-Review this file in preparation for using some of the data in the next step.
+Review the data in this file in preparation for passing it as parameters to the CloudFormation stack in the next step.
 
 ### 3. Deploy VPN Gateway Stack
 
 In this step you'll create a CloudFormation stack using the [`vpn-gateway-strongswan.yml`](./vpn-gateway-strongswan.yml) template and configuration data obtained from the remote site's Site-to-Site VPN Connection resource.
 
-* Use the CloudFormation template to deploy a VPN gateway stack in a public subnet based on the parameters described below.
+* Use the CloudFormation template to deploy a VPN gateway stack in a public subnet based on the [Parameters](#parameters) described below.
 * Wait for creation of the stack to complete. Since the template uses a wait condition, the stack won't complete until strongSwan and other components have been configured and started.
 * Wait for several minutes after stack creation completes. Then monitor the Site-to-Site VPN Connection on the remote site to confirm that the two VPN tunnels have progressed from the `DOWN` state to the `UP` state.  If the VPN gateway configuration is correct, Tunnel 1 will come up first followed several minutes later by Tunnel 2.
 
@@ -106,7 +106,7 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |`pVpcId`|Required|The VPC in which the VPN gateway is to be deployed.|None|
 |`pVpcCidr`|Required|The CIDR block of the local VPC. Used to advertise via BGP routing information to the remote site.|None|
 |`pPublicSubnetId`|Required|The publicly accessible subnet in which the VPN gateway is to be deployed.|None|
-|`pEipStackName`|Required|The name of the CloudFormation stack that was used to configure an Elastic IP address. See [https://github.com/ckamps/infra-aws-elastic-ip](https://github.com/ckamps/infra-aws-elastic-ip)|None|
+|`pEipAllocationId`|Required|The allocation ID of the Elastic IP address that is to be associated with the VPN gateway.|None|
 |`pLocalBgpAsn`|Optional|The BGP Autonomous System Number (ASN) used to represent the local end of the site-to-site VPN connection.|`65000`|
 |`pTunnel1BgpNeighborIpAddress`|Required|See the remote site's configuration.|None|
 |**EC2 Instance**| | | |

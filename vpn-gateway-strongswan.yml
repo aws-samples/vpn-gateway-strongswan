@@ -41,7 +41,7 @@ Metadata:
       - pVpcId
       - pVpcCidr
       - pPublicSubnetId
-      - pEipStackName
+      - pEipAllocationId
       - pLocalBgpAsn
     - Label:
         default: EC2  
@@ -85,8 +85,8 @@ Metadata:
       pTunnel2BgpNeighborIpAddress:
         default: VPN Tunnel 2 BGP Neighbor IP Address
 
-      pEipStackName:
-        default: Elastic IP Address Stack Name
+      pEipAllocationId:
+        default: Elastic IP Address Allocation ID
       pLocalBgpAsn:
         default: Local VPN Gateway's BGP ASN
       pVpcId:
@@ -172,9 +172,10 @@ Parameters:
     Type: Number
     Default: 64512
 
-  pEipStackName:
-    Description: Elastic IP Address Stack Name
+  pEipAllocationId:
+    Description: Elastic IP Address Alocation ID
     Type: String
+    AllowedPattern: ^eipalloc-[A-Za-z0-9]+
 
   pLocalBgpAsn:
     Description: Local VPN Gateway's BGP ASN
@@ -650,8 +651,7 @@ Resources:
   rVpnGatewayEipAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      AllocationId: 
-        Fn::ImportValue: !Sub '${pEipStackName}::allocation-id' 
+      AllocationId: !Ref pEipAllocationId
       InstanceId: !Ref rVpnGateway
 
   rVpnGateway:
