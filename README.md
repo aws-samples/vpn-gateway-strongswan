@@ -124,7 +124,7 @@ If any of the following log files are not present: `charon.log`, `zebra.log`, `b
 
 Log files in order of importance are:
 
-* `cf-init.log` - Look for successful execution of the comnfiguration sets from the `AWS::CloudFormation::Init` section of the CloudFormation template.
+* `cf-init.log` - Look for successful execution of the configuration sets from the `AWS::CloudFormation::Init` section of the CloudFormation template.
 * `charon.log` - If initialization looks ok, check the content of this log file to monitor the establishment of the VPN tunnels.
 
 ### Can't Ping Across the VPN Connection
