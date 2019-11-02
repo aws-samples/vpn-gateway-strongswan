@@ -32,15 +32,11 @@ Even if you're not interested in deploying a VPN gateway, but you're interested 
 
 ## Usage
 
-### 1. Obtain Elastic IP Address
+### 1. Create an Elastic IP Address
 
 Decoupling the creation and management of the Elastic IP Address (EIP) from the creation and management of the VPN gateway enables you to replace the VPN gateway stack and associated EC2 instance without needing to reconfigure the remote end of the site-to-site VPN connection.
 
-Create an EIP and obtain its allocation ID so that you can pass it as a parameter to the CloudFormation stack through which the VPN gateway will be created.  You can either create the EIP manually or use 
-
-An example CloudFormation template:
-
-[`elastic-ip-address.yml`](./elastic-ip-address.yml)
+Create an EIP and obtain its allocation ID so that you can pass it as a parameter to the CloudFormation stack through which the VPN gateway will be created.
 
 ### 2. Determine VPN Tunnel Configuration Settings
 
@@ -58,7 +54,7 @@ In this step you'll create a CloudFormation stack using the [`vpn-gateway-strong
 
 If the tunnels have not come up 3-5 minutes after creation of the VPN gateway stack completed, then see the Troubleshooting section below.
 
-### 4. Ensure Routing and EC2 Security Groups Are in Place
+### 4. Ensure Routing Tables and EC2 Security Groups Are in Place
 
 On both sides of the site-to-site VPN connection, ensure that the appropriate routing and security group configurations are in place to enable proper routing of traffic. For example:
 
@@ -116,13 +112,20 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 
 ### VPN Gateway Stack Fails On Creation
 
-TBD
+Verify that the parameters provided match the EIP allocation ID.
 
 ### Tunnels Don't Come Up
 
 It's likely that one or more of the tunnel related stack parameters is incorrect. Double check the settings.  You can delete and recreate the VPN gateway stack without needing to delete and recreate the remote site's VPN resources.
 
-You can also inspect the VPN gateway's logs via CloudWatch Logs.  In CloudWatch Logs, look for a log group that is named based on the system classification parameters described above. For example: `/infra/vpngw/ec2/...`. If you see any of the following log files not present: `charon.log`, `zebra.log`, `bgpd.log`, then you should access the gateway instance and check the `systemctl` messages to see why a service did not start.
+You can also inspect the VPN gateway's logs via CloudWatch Logs.  In CloudWatch Logs, look for a log group that is named based on the system classification parameters described above. For example: `/infra/vpngw/ec2/...`. 
+
+If any of the following log files are not present: `charon.log`, `zebra.log`, `bgpd.log`, start a terminal session with the gateway instance and use the `systemctl status <service name>` command to understand why a service did not start.
+
+Log files in order of importance are:
+
+* `cf-init.log` - Look for successful execution of the comnfiguration sets from the `AWS::CloudFormation::Init` section of the CloudFormation template.
+* `charon.log` - If initialization looks ok, check the content of this log file to monitor the establishment of the VPN tunnels.
 
 ### Can't Ping Across the VPN Connection
 
