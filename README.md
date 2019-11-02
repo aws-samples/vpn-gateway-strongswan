@@ -23,7 +23,6 @@ The open source [Quagga](https://en.wikipedia.org/wiki/Quagga_(software) ) softw
 
 Even if you're not interested in deploying a VPN gateway, but you're interested in better understanding what you can do with CloudFormation in support of Infrastructure as Code (IaC), you might find value in reviewing how the template makes use of these generally applicable capabilities:
 
-* [`Fn::ImportValue`](https://docs.aws.amazon.com/en_pv/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-importvalue.html) to import data exported from other CloudFormation stacks.
 * [`AWS::CloudFormation::Init`](https://docs.aws.amazon.com/en_pv/AWSCloudFormation/latest/UserGuide/aws-resource-init.html) to completely automate the build out of the VPN gateway stack and BGP support upon first boot.
 * [`AWS::CloudFormation::WaitCondition`](https://docs.aws.amazon.com/en_pv/AWSCloudFormation/latest/UserGuide/aws-properties-waitcondition.html) to force the stack creation process to wait until the first boot build out is complete.
 * AWS CloudWatch Logs integration via the [CloudWatch Logs Agent](https://docs.aws.amazon.com/en_pv/AmazonCloudWatch/latest/logs/CWL_GettingStarted.html) in which OS, VPN gateway, and BGP log files are written to a series of log streams in a CloudWatch Logs log group.
