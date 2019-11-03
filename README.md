@@ -1,6 +1,6 @@
 # VPN Gateway Stack Using strongSwan
 
-CloudFormation template to deploy the open source [strongSwan VPN](https://www.strongswan.org/) solution to act as a VPN gateway in support of site-to-site VPN connections.
+An AWS CloudFormation template to deploy the open source [strongSwan VPN](https://www.strongswan.org/) solution to act as a VPN gateway in support of site-to-site VPN connections.
 
 The open source [Quagga](https://en.wikipedia.org/wiki/Quagga_(software) ) software suite is used to provide [Border Gateway Protocol (BGP)](https://searchnetworking.techtarget.com/definition/BGP-Border-Gateway-Protocol) support to automatically propagate routing information across a site-to-site VPN connection.
 
