@@ -32,11 +32,17 @@ Even if you're not interested in deploying a VPN gateway, but you're interested 
 
 ## Usage
 
-### 1. Create an Elastic IP Address
+### 1. Determine Deployment Location: Public or Private Subnet
 
-Decoupling the creation and management of the Elastic IP Address (EIP) from the creation and management of the VPN gateway enables you to replace the VPN gateway stack and associated EC2 instance without needing to reconfigure the remote end of the site-to-site VPN connection.
+Since VPN connections typically occur over the public Internet, you'll need to have at least one public IP address to represent the local side of the VPN tunnels.  You have several options to associate a public IP address. In either case, decoupling the creation and management of the public IP address from the creation and management of the VPN gateway enables you to replace the VPN gateway stack including the associated strongSwan EC2 instance without needing to reconfigure the remote end of the site-to-site VPN connection.
 
-Create an EIP and obtain its allocation ID so that you can pass it as a parameter to the CloudFormation stack through which the VPN gateway will be created.
+#### Option 1: Deploy VPN Gateway in Public Subnet and Use Elastic IP Address
+
+Before deploying this stack, create an EIP and obtain its allocation ID so that you can pass it as a parameter to the CloudFormation stack through which the VPN gateway will be created.  When deploying this stack, you set the parameter `pUseElasticIp` to `true` and supply a value for the `pEipAllocationId` parameter.
+
+#### Option 2: Deploy VPN gateway in Private Subnet and Use a NAT Gateway
+
+In this case, you discover the public IP address of the NAT Gateway and use it when configuring the remote side of the VPN connection.  When deploying this stack, you accept the default `false` setting for the `pUseElasticIp` parameter. Since the local side of the site-to-site VPN initiates the connection, the local strongSwan VON gateway will initiate the connection through the NAT Gateways public IP address.
 
 ### 2. Determine VPN Tunnel Configuration Settings
 
@@ -100,8 +106,9 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |**Local Network**| | | |
 |`pVpcId`|Required|The VPC in which the VPN gateway is to be deployed.|None|
 |`pVpcCidr`|Required|The CIDR block of the local VPC. Used to advertise via BGP routing information to the remote site.|None|
-|`pPublicSubnetId`|Required|The publicly accessible subnet in which the VPN gateway is to be deployed.|None|
-|`pEipAllocationId`|Required|The allocation ID of the Elastic IP address that is to be associated with the VPN gateway.|None|
+|`pSubnetId`|Required|The subnet in which the VPN gateway is to be deployed.|None|
+|`pUseElasticIp`|Optional|Use elastic IP address?|`false`|
+|`pEipAllocationId`|Conditional|The allocation ID of the Elastic IP address that is to be associated with the VPN gateway. Required when `pUseElasticIP` = `true`|None|
 |`pLocalBgpAsn`|Optional|The BGP Autonomous System Number (ASN) used to represent the local end of the site-to-site VPN connection.|`65000`|
 |`pTunnel1BgpNeighborIpAddress`|Required|See the remote site's configuration.|None|
 |**EC2 Instance**| | | |

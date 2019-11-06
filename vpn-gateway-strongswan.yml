@@ -40,7 +40,8 @@ Metadata:
       Parameters:
       - pVpcId
       - pVpcCidr
-      - pPublicSubnetId
+      - pSubnetId
+      - pUseElasticIp
       - pEipAllocationId
       - pLocalBgpAsn
     - Label:
@@ -85,6 +86,8 @@ Metadata:
       pTunnel2BgpNeighborIpAddress:
         default: VPN Tunnel 2 BGP Neighbor IP Address
 
+      pUseElasticIp:
+        default: Use Elastic IP Address?
       pEipAllocationId:
         default: Elastic IP Address Allocation ID
       pLocalBgpAsn:
@@ -93,8 +96,8 @@ Metadata:
         default: VPC ID
       pVpcCidr:
         default: VPC CIDR Block
-      pPublicSubnetId:
-        default: Public Subnet ID for VPN Gateway
+      pSubnetId:
+        default: Subnet ID for VPN Gateway
 
       pInstanceType:
         default: EC2 Instance Type
@@ -171,11 +174,16 @@ Parameters:
     Description: VPN Tunnel 2 BGP ASN
     Type: Number
     Default: 64512
+  
+  pUseElasticIp:
+    Type: String
+    Description: Whether Elastic IP address is to be used.
+    Default: false
+    AllowedValues: [true, false]
 
   pEipAllocationId:
     Description: Elastic IP Address Alocation ID
     Type: String
-    AllowedPattern: ^eipalloc-[A-Za-z0-9]+
 
   pLocalBgpAsn:
     Description: Local VPN Gateway's BGP ASN
@@ -195,8 +203,8 @@ Parameters:
     Type: String
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
 
-  pPublicSubnetId:
-    Description: Public Subnet ID for VPN Gateway
+  pSubnetId:
+    Description: Subnet ID for VPN Gateway
     Type: AWS::EC2::Subnet::Id
 
   pInstanceType:
@@ -224,6 +232,10 @@ Rules:
                 - VpcId
             - 'Fn::RefAll': 'AWS::EC2::VPC::Id'
         AssertDescription: All subnets must in the VPC
+
+Conditions:
+
+  cUseElasticIp: !Equals [ !Ref 'pUseElasticIp', true ]
 
 Resources:
   rInstanceSecurityGroup:
@@ -277,7 +289,7 @@ Resources:
             Description: !Sub '${pSystem}-${pApp}-${pEnvPurpose}'
             Groups:
               - !Ref rInstanceSecurityGroup
-            AssociatePublicIpAddress: true
+            AssociatePublicIpAddress: !Ref pUseElasticIp
         UserData:
           Fn::Base64: !Sub |
             #!/bin/bash -xe
@@ -650,6 +662,7 @@ Resources:
 
   rVpnGatewayEipAssociation:
     Type: AWS::EC2::EIPAssociation
+    Condition: cUseElasticIp
     Properties:
       AllocationId: !Ref pEipAllocationId
       InstanceId: !Ref rVpnGateway
@@ -665,7 +678,7 @@ Resources:
             [ rLaunchTemplate, LatestVersionNumber ]
       NetworkInterfaces:
         - DeviceIndex: '0'
-          SubnetId: !Ref pPublicSubnetId
+          SubnetId: !Ref pSubnetId
       SourceDestCheck: false
       Tags:
         - Key: Name
