@@ -5,7 +5,7 @@ An [AWS CloudFormation](https://aws.amazon.com/cloudformation/) template that ca
 Even if you don’t have a need to demonstrate integration with AWS site-to-site VPN capabilities, you might find value in reviewing the Infrastructure as Code (IaC) techniques demonstrated by the example AWS CloudFormation template including its built-in integrations with other AWS services to support logging, resource monitoring, and secure remote terminal access.
 
 * [Use Cases](#use-cases)
-* [CloudFormation Features Demonstrated](#cloudformation-features-demonstrated)
+* [Integration with AWS Services](#cloudformation-features-demonstrated)
 * [Usage](#usage)
 * [Parameters](#parameters)
 * [Troubleshooting](#troubleshooting)
