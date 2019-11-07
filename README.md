@@ -17,9 +17,27 @@ Even if you don’t have a need to demonstrate integration with AWS site-to-site
 
 The example template can be useful for experimenting, testing, and demonstrating integration scenarios with the AWS Site-to-Site VPN feature and more formally implementing site-to-site VPN connections where the built-in AWS VPN services might not apply.
 
-* **Demonstration and Lab Environments:** When you don’t have ready access to either real on-premises VPN hardware or software appliances, this example can be useful in demonstrating how to integrate an on-premises network with AWS networks via AWS site-to-site VPN connections and either AWS Virtual Private Gateways (VPGs) or AWS Transit Gateways (TGWs).
+### Demonstration and Lab Environments
 
-* **Both Ends of a Site-to-Site VPN Connection:** The example template can also be used on both ends of a site-to-site VPN connection in scenarios where VPGs and TGWs are not applicable.
+When you don’t have ready access to either real on-premises VPN hardware or software appliances, this example can be useful in demonstrating how to integrate an on-premises network with AWS networks via AWS site-to-site VPN connections and either AWS Virtual Private Gateways (VPGs) or AWS Transit Gateways (TGWs).
+
+**Site-to-Site VPN with AWS Transit Gateway**
+
+See [Transit Gateway Example: Centralized Router](https://docs.aws.amazon.com/vpc/latest/tgw/transit-gateway-centralized-router.html) for an overview of this topology.
+
+<img src="images/site-to-site-vpn-scenarios-tgw.png" alt="Site-to-Site VPN with AWS Transit Gateway" width="800"/>
+
+**Site-to-Site VPN with AWS Virtual Private Gateway**
+
+See [AWS Site-to-Site VPN](https://docs.aws.amazon.com/vpn/latest/s2svpn/SetUpVPNConnections.html) for details on this configuration.
+
+<img src="images/site-to-site-vpn-scenarios-vgw.png" alt="Site-to-Site VPN with AWS Transit Gateway" width="800"/>
+
+### Both Ends of a DIY Site-to-Site VPN Connection
+
+The example template can also be used on both ends of a site-to-site VPN connection in scenarios where VPGs and TGWs are not applicable. Normally, you would use either VPC Peering or AWS Transit Gateway when you control the environments on both ends of a site-to-site VPN connection, but there may be circumstances in which you want to manage the VPN gateway on both ends.
+
+<img src="images/site-to-site-vpn-scenarios-diy.png" alt="Site-to-Site VPN with AWS Transit Gateway" width="800"/>
 
 ## Integration with AWS Services
 
@@ -40,6 +58,8 @@ The example AWS CloudFormation template automatically builds a stack that demons
 * Standardized naming of cloud resources to help distinguish from other resources, identify ownership, and potentially aid in access control.
 
 ## Usage
+
+The following instructions are primarily oriented toward the first use case and two deployment topologies described above: Site-to-Site VPN with AWS Transit Gateway and Site-to-Site VPN with Virtual Private Gateway.  If you're interested in demonstrating a DIY solution for both ends of a site-to-site VPN connection, you should be able to easily extend these instructions.
 
 ### 1. Determine Deployment Location: Public or Private Subnet
 
