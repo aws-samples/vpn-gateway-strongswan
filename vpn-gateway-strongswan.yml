@@ -36,7 +36,7 @@ Metadata:
       - pTunnel2BgpAsn
       - pTunnel2BgpNeighborIpAddress
     - Label:
-        default: Local Network
+        default: Local Network Configuration
       Parameters:
       - pVpcId
       - pVpcCidr
@@ -87,7 +87,7 @@ Metadata:
         default: VPN Tunnel 2 BGP Neighbor IP Address
 
       pUseElasticIp:
-        default: Use Elastic IP Address?
+        default: Use Elastic IP Address? (true/false)
       pEipAllocationId:
         default: Elastic IP Address Allocation ID
       pLocalBgpAsn:
@@ -174,7 +174,7 @@ Parameters:
     Description: VPN Tunnel 2 BGP ASN
     Type: Number
     Default: 64512
-  
+    
   pUseElasticIp:
     Type: String
     Description: Whether Elastic IP address is to be used.
@@ -234,7 +234,6 @@ Rules:
         AssertDescription: All subnets must in the VPC
 
 Conditions:
-
   cUseElasticIp: !Equals [ !Ref 'pUseElasticIp', true ]
 
 Resources:

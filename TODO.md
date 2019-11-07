@@ -4,17 +4,17 @@ In order of importance:
 
 * Validate that the gateway function properly after EC2 instance is restarted. e.g. that all settings are persistent and system services come up automatically upon OS restart.
 
-* Provide a parameter to automatically configure source IP address translation for traffic leaving the strongSwan VPN gateway so that remotely sourced traffic can be routed beyond the local VPC via, for example, either an Internet Gateway or NAT Gateway. For example, when attempting to route remote traffic onward, the following commands can be used to perform source IP address translation so that the traffic emanating from the strongSwan instance looks like it is originating from that instance and will be routable outside the VPC.
+* Provide a parameter to automatically configure source IP address translation for traffic leaving the strongSwan VPN gateway so that remotely sourced traffic can be routed beyond the local VPC via, for example, either an Internet Gateway or NAT Gateway. See the Advanced Usage section of the `README.md` for manual configuration instructions.
+
+See https://fedoraproject.org/wiki/How_to_edit_iptables_rules for examples of how to persist iptables rules.
+
+Automating and persisting this configuration will require installation of the following package and enablement of the `iptables` service:
 
 ```
-# /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+$ sudo yum install iptables-services
 
-or
-
-# iptables -t nat -A POSTROUTING -s 10.0.4.0/18 -o eth0 -j MASQUERADE
+$ sudo systemctl enable iptables.service
 ```
-
-Another option is to insert a Transit Gateway to handle transitive routing without needing to perform source IP translation on the local VPN gateway.
 
 * Consider enhancing cfn-init handling to support updates to the stack.
 

@@ -1,8 +1,8 @@
 # VPN Gateway Stack Using strongSwan
 
-An AWS CloudFormation template to deploy the open source [strongSwan VPN](https://www.strongswan.org/) solution to act as a VPN gateway in support of site-to-site VPN connections.
+An [AWS CloudFormation](https://aws.amazon.com/cloudformation/) template that can be used to automate deployment of the open source [strongSwan VPN solution](https://www.strongswan.org/) as a VPN gateway in support of several different site-to-site VPN topologies.  The open source [Quagga](https://en.wikipedia.org/wiki/Quagga_(software) ) software suite complements the role of strongSwan by providing [Border Gateway Protocol (BGP)](https://searchnetworking.techtarget.com/definition/BGP-Border-Gateway-Protocol) support to automatically propagate routing information across site-to-site VPN connections.
 
-The open source [Quagga](https://en.wikipedia.org/wiki/Quagga_(software) ) software suite is used to provide [Border Gateway Protocol (BGP)](https://searchnetworking.techtarget.com/definition/BGP-Border-Gateway-Protocol) support to automatically propagate routing information across a site-to-site VPN connection.
+Even if you don’t have a need to demonstrate integration with AWS site-to-site VPN capabilities, you might find value in reviewing the Infrastructure as Code (IaC) techniques demonstrated by the example AWS CloudFormation template including its built-in integrations with other AWS services to support logging, resource monitoring, and secure remote terminal access.
 
 * [Use Cases](#use-cases)
 * [CloudFormation Features Demonstrated](#cloudformation-features-demonstrated)
@@ -15,20 +15,29 @@ The open source [Quagga](https://en.wikipedia.org/wiki/Quagga_(software) ) softw
 
 ## Use Cases
 
-* **Demonstration and Lab Environments Representing On-Premises VPN Gateways:** This stack can be useful to help demonstrate how to integrate an on-premises VPN gateway with AWS networks via Virtual Private Gateways (VPGs) and Transit Gateways (TGWs).  
+The example template can be useful for experimenting, testing, and demonstrating integration scenarios with the AWS Site-to-Site VPN feature and more formally implementing site-to-site VPN connections where the built-in AWS VPN services might not apply.
 
-* **Both Ends of a Site-to-Site VPN Connection:** This stack can also be used on both ends of a site-to-site VPN connection in scenarios where VPGs and TGWs are not applicable. For example, until TGWs support inter-region routing, you can demonstrate how to fill the gap by using a site-to-site VPN using this stack on both ends.  See the "Transit VPC" section of [Multiple Region Multi-VPC Connectivity](https://aws.amazon.com/answers/networking/aws-multiple-region-multi-vpc-connectivity/) for the scenario.
+* **Demonstration and Lab Environments:** When you don’t have ready access to either real on-premises VPN hardware or software appliances, this example can be useful in demonstrating how to integrate an on-premises network with AWS networks via AWS site-to-site VPN connections and either AWS Virtual Private Gateways (VPGs) or AWS Transit Gateways (TGWs).
 
-## CloudFormation Features Demonstrated
+* **Both Ends of a Site-to-Site VPN Connection:** The example template can also be used on both ends of a site-to-site VPN connection in scenarios where VPGs and TGWs are not applicable.
 
-Even if you're not interested in deploying a VPN gateway, but you're interested in better understanding what you can do with CloudFormation in support of Infrastructure as Code (IaC), you might find value in reviewing how the template makes use of these generally applicable capabilities:
+## Integration with AWS Services
 
-* [`AWS::CloudFormation::Init`](https://docs.aws.amazon.com/en_pv/AWSCloudFormation/latest/UserGuide/aws-resource-init.html) to completely automate the build out of the VPN gateway stack and BGP support upon first boot.
-* [`AWS::CloudFormation::WaitCondition`](https://docs.aws.amazon.com/en_pv/AWSCloudFormation/latest/UserGuide/aws-properties-waitcondition.html) to force the stack creation process to wait until the first boot build out is complete.
-* AWS CloudWatch Logs integration via the [CloudWatch Logs Agent](https://docs.aws.amazon.com/en_pv/AmazonCloudWatch/latest/logs/CWL_GettingStarted.html) in which OS, VPN gateway, and BGP log files are written to a series of log streams in a CloudWatch Logs log group.
-* CloudWatch monitoring integration for [monitoring EC2 memory and disk metrics](https://docs.aws.amazon.com/en_pv/AWSEC2/latest/UserGuide/mon-scripts.html).
-* Use of [AWS Systems Manager Session Manager](https://docs.aws.amazon.com/en_pv/systems-manager/latest/userguide/session-manager.html) to enable secure terminal access to the OS instance without the need to establish Internet accessible bastion hosts and port 22 access to the VPN gateway.
-* Using [Systems Manager Parameter Store](https://aws.amazon.com/blogs/compute/query-for-the-latest-amazon-linux-ami-ids-using-aws-systems-manager-parameter-store/) to query for latest Amazon Linuix 2 Amazon Machine Image (AMI) images.
+The example AWS CloudFormation template automatically builds a stack that demonstrates use of the following AWS services, features, and best practices:
+
+* AWS CloudFormation features including the [`AWS::CloudFormation::Init`](https://docs.aws.amazon.com/en_pv/AWSCloudFormation/latest/UserGuide/aws-resource-init.html) feature to completely automate the build out of the VPN gateway stack and BGP support upon first boot and the [`AWS::CloudFormation::WaitCondition`](https://docs.aws.amazon.com/en_pv/AWSCloudFormation/latest/UserGuide/aws-properties-waitcondition.html) feature to force the stack creation process to wait until the first boot build out is complete.
+
+*	[Amazon EC2](https://aws.amazon.com/ec2/) provides the compute platform in which to deploy the strongSwan VPN gateway.
+
+*	[Amazon CloudWatch Logs](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html) integration via the [CloudWatch Logs Agent](https://docs.aws.amazon.com/en_pv/AmazonCloudWatch/latest/logs/CWL_GettingStarted.html) in which OS, VPN gateway, and BGP log files are written to a series of log streams in a CloudWatch Logs log group.
+
+* [Amazon CloudWatch](https://aws.amazon.com/cloudwatch/) integration for [monitoring EC2 memory and disk metrics](https://docs.aws.amazon.com/en_pv/AWSEC2/latest/UserGuide/mon-scripts.html).
+
+* [AWS Systems Manager Session Manager](https://docs.aws.amazon.com/en_pv/systems-manager/latest/userguide/session-manager.html) to enable secure terminal access to the OS instance without the need to establish Internet accessible bastion hosts and port 22 access to the VPN gateway.
+
+* [Systems Manager Parameter Store](https://aws.amazon.com/blogs/compute/query-for-the-latest-amazon-linux-ami-ids-using-aws-systems-manager-parameter-store/) to query for latest Amazon Linux 2 Amazon Machine Image (AMI) images.
+
+* Standardized naming of cloud resources to help distinguish from other resources, identify ownership, and potentially aid in access control.
 
 ## Usage
 
@@ -85,10 +94,10 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |Parameter|Required|Description|Default|
 |---------|--------|-----------|-------|
 |**System Classification and Environment**| | | |
-|`pOrg`|Optional|Per AWS resource naming standards, the business organization to apply to resources such as IAM roles.|`acme`|
-|`pSystem`|Optional|Per AWS resource naming standards, system ID to apply to AWS resources.|`infra`|
-|`pApp`|Optional|Per AWS resource naming standards, app ID to apply to AWS resources.|`vpngw`|
-|`pEnvPurpose`|Optional|Per AWS resource naming standards, qualifier as to purpose of this particular instance of the stack. For example, "dev1", "test", "1", etc.|None|
+|`pOrg`|Optional|As an example of using resurce naming standards, include the business organization in the names of resources including, for example, IAM roles.|`acme`|
+|`pSystem`|Optional|As an example of using resurce naming standards, include a system identifier in the names of resources including, for example, IAM roles..|`infra`|
+|`pApp`|Optional|As an example of using resurce naming standards, include an application identifier in the names of resources including, for example, IAM roles.|`vpngw`|
+|`pEnvPurpose`|Optional|As an example of using resurce naming standards, include a purpose for this particulart instance of the stack in the names of resources including, for example, IAM roles.. For example, "dev1", "test", "1", etc.|None|
 |**VPN Tunnel 1**| | | |
 |`pTunnel1Psk`|Required|See the remote site's configuration for the "IPSec Tunnel #1" section and "Pre-Shared Key" value.|None|
 |`pTunnel1RemoteExternalIpAddress`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Outside IP Addresses" section and "Virtual Private Gateway" value.|None|
@@ -119,9 +128,11 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 
 ### VPN Gateway Stack Fails On Creation
 
-Verify that the parameters provided match the EIP allocation ID.
+Double check your parameter settings against both your local network configuration and the configuration of the site-to-site tunnels.  If you're using an Elastic IP address, ensure that the allocation ID is correct.
 
 ### Tunnels Don't Come Up
+
+Ensure that you've waited 5 minutes or so to give the tunnels time to establish.
 
 It's likely that one or more of the tunnel related stack parameters is incorrect. Double check the settings.  You can delete and recreate the VPN gateway stack without needing to delete and recreate the remote site's VPN resources.
 
@@ -136,7 +147,7 @@ Log files in order of importance are:
 
 ### Can't Ping Across the VPN Connection
 
-Things to double check:
+Verify correctness of the following configurations on both sides of the site-to-site VPN connection:
 * EC2 instance security groups.
 * Route tables.
 
@@ -155,6 +166,66 @@ Until the `AWS::EC2::LaunchTemplate` is modified to support stack updates (see `
 Since the Elastic IP Address resource is managed via a distinct CloudFormation stack, you can delete a VPN gateway stack without also deleting the associated EIP address. If you are using the VPN gateway stack to set up a site-to-site VPN with AWS VPG or TGW resources, you can simply delete the existing VPN gateway stack and create a new stack with the same parameters.  The remote side of the site-to-site VPN connection will automatically reconnect once the new VPN gateway has been established.
 
 After deploying the new VPN gateway stack, you will need to ensure that any local routing table entries are updated to point to the new VPN gateway EC2 instance.
+
+### Masking Source IP Addresses
+
+If you'd like the VPC in which the strongSwan VPN gateway is running to forward traffice from the VPN connection to either other VPCs via VPC Peering or onward via gateways such an Internet Gateway to NAT Gateway, you'll need to configure the VPN gateway to mask the original source IP address by using the VPN gateway's IP address.
+
+You can implement source network IP masking via an `iptables` command.  For example, the following command when run on the strongSwan VPN gatewy will mask the source IP address only for traffic whose destination IP address does not match the specified network. e.g. It will mask traffic destined for the Internet, but not for the local network. Presence of the `!` argument prior to the `-d` argument ensures that the all destinations other than the stated network will be subject to the masking rule.
+
+```
+$ sudo /sbin/iptables -t nat -A POSTROUTING -o eth0 ! -d 10.0.0.0/16 -j MASQUERADE
+```
+Alternatively, you can choose to mask all traffic:
+
+```
+$ sudo /sbin/iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+```
+
+Other useful `iptables` commands include:
+
+```
+# List the current rules:
+
+# With packet counts:
+
+$ sudo iptables -t nat -L -v
+
+Chain PREROUTING (policy ACCEPT 12 packets, 1001 bytes)
+ pkts bytes target     prot opt in     out     source               destination
+
+Chain INPUT (policy ACCEPT 1 packets, 93 bytes)
+ pkts bytes target     prot opt in     out     source               destination
+
+Chain OUTPUT (policy ACCEPT 234 packets, 16318 bytes)
+ pkts bytes target     prot opt in     out     source               destination
+
+Chain POSTROUTING (policy ACCEPT 152 packets, 11245 bytes)
+ pkts bytes target     prot opt in     out     source               destination
+   93  5981 MASQUERADE  all  --  any    eth0    anywhere            !10.0.0.0/16
+
+# With line numbers:
+
+$ sudo iptables -t nat -L --line-numbers
+
+Chain PREROUTING (policy ACCEPT)
+num  target     prot opt source               destination
+
+Chain INPUT (policy ACCEPT)
+num  target     prot opt source               destination
+
+Chain OUTPUT (policy ACCEPT)
+num  target     prot opt source               destination
+
+Chain POSTROUTING (policy ACCEPT)
+num  target     prot opt source               destination
+1    MASQUERADE  all  --  anywhere            !10.0.0.0/16
+
+# Delete a specific rule based on line number:
+
+$ sudo iptables -t nat -D POSTROUTING 1
+```
+See [TODO.md](./TODO.md) for an entry calling for the optional automation of source IP masking.
 
 ## Contributing
 
