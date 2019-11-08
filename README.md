@@ -4,7 +4,7 @@ An [AWS CloudFormation](https://aws.amazon.com/cloudformation/) template that ca
 
 Even if you don’t have a need to demonstrate integration with AWS site-to-site VPN capabilities, you might find value in reviewing the Infrastructure as Code (IaC) techniques demonstrated by the example AWS CloudFormation template including its built-in integrations with other AWS services to support logging, resource monitoring, and secure remote terminal access.
 
-* [Use Cases](#use-cases)
+* [Use Cases and Topologies](#use-cases-and-topologies)
 * [Integration with AWS Services](#cloudformation-features-demonstrated)
 * [Usage](#usage)
 * [Parameters](#parameters)
@@ -13,7 +13,7 @@ Even if you don’t have a need to demonstrate integration with AWS site-to-site
 * [Contributing](#contributing)
 * [License](#license)
 
-## Use Cases
+## Use Cases and Topologies
 
 The example template can be useful for experimenting, testing, and demonstrating integration scenarios with the AWS Site-to-Site VPN feature and more formally implementing site-to-site VPN connections where the built-in AWS VPN services might not apply.
 
@@ -175,7 +175,7 @@ Consider using `tcpdump` on the VPN gateway EC2 instance to see if traffic is be
 
 ## Advanced Usage
 
-### Updating the VPN Gateway Stack
+### Updating a VPN Gateway Stack
 
 If you need to change resources that are configured outside of the `UserData` and `Metadata` sections of the `AWS::EC2::LaunchTemplate`, you should be able to update either the template or stack parameters and update the stack in place.
 
