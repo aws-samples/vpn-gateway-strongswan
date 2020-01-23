@@ -15,15 +15,17 @@ Even if you don’t have a need to demonstrate integration with AWS site-to-site
 
 ## Use Cases and Topologies
 
-The example template can be useful for experimenting, testing, and demonstrating integration scenarios with the AWS Site-to-Site VPN feature and more formally implementing site-to-site VPN connections where the built-in AWS VPN services might not apply.
+The example template can be useful for experimenting, testing, and demonstrating integration scenarios with the AWS Site-to-Site VPN feature and more formally implementing site-to-site VPN connections where use of managed AWS VPN services might not apply.
 
 ### Demonstration and Lab Environments
 
-When you don’t have ready access to either real on-premises VPN hardware or software appliances, this example can be useful in demonstrating how to integrate an on-premises network with AWS networks via AWS site-to-site VPN connections and either AWS Virtual Private Gateways (VPGs) or AWS Transit Gateways (TGWs).
+When you don’t have ready access to either real on-premises VPN hardware or software appliances, this example can be useful in demonstrating how to integrate an on-premises network with AWS networks via AWS site-to-site VPN connections and either AWS Virtual Private Gateways (VGWs) or AWS Transit Gateways (TGWs).
 
 **Site-to-Site VPN with AWS Transit Gateway**
 
 See [Transit Gateway Example: Centralized Router](https://docs.aws.amazon.com/vpc/latest/tgw/transit-gateway-centralized-router.html) for an overview of this topology.
+
+In the following diagram, an EC2 instance deployed to a VPC that is emulating a customer’s on-premises network is running the strongSwan VPN stack and is acting as a VPN Customer Gateway in a site-to-site VPN configuration with an AWS Transit Gateway on the other end of the connection.
 
 <img src="images/site-to-site-vpn-scenarios-tgw.png" alt="Site-to-Site VPN with AWS Transit Gateway" width="800"/>
 
@@ -31,11 +33,13 @@ See [Transit Gateway Example: Centralized Router](https://docs.aws.amazon.com/vp
 
 See [AWS Site-to-Site VPN](https://docs.aws.amazon.com/vpn/latest/s2svpn/SetUpVPNConnections.html) for details on this configuration.
 
+In the following diagram, an EC2 instance deployed to a VPC that is emulating a customer’s on-premises network is running the strongSwan VPN stack and is acting as a VPN Customer Gateway in a site-to-site VPN configuration with an AWS Virtual Private Gateway (VGW) on the other end of the connection.
+
 <img src="images/site-to-site-vpn-scenarios-vgw.png" alt="Site-to-Site VPN with AWS Transit Gateway" width="800"/>
 
 ### Both Ends of a DIY Site-to-Site VPN Connection
 
-The example template can also be used on both ends of a site-to-site VPN connection in scenarios where VPGs and TGWs are not applicable. Normally, you would use either VPC Peering or AWS Transit Gateway when you control the environments on both ends of a site-to-site VPN connection, but there may be circumstances in which you want to manage the VPN gateway on both ends.
+The example template can also be used to establish a VPN Gateway on both ends of a site-to-site VPN connection in scenarios where VGWs and TGWs are not applicable. Normally, you would use either VPC Peering or AWS Transit Gateway when you control the environments on both ends of a site-to-site VPN connection, but there may be circumstances in which you want to manage the VPN gateway on both ends.
 
 <img src="images/site-to-site-vpn-scenarios-diy.png" alt="Site-to-Site VPN with AWS Transit Gateway" width="800"/>
 
@@ -67,27 +71,39 @@ Since VPN connections typically occur over the public Internet, you'll need to h
 
 #### Option 1: Deploy VPN Gateway in Public Subnet and Use Elastic IP Address
 
-Before deploying this stack, create an EIP and obtain its allocation ID so that you can pass it as a parameter to the CloudFormation stack through which the VPN gateway will be created.  When deploying this stack, you set the parameter `pUseElasticIp` to `true` and supply a value for the `pEipAllocationId` parameter.
+Before deploying this stack, create an Elastic IP (EIP) address and obtain its allocation ID so that you can pass it as a parameter to the CloudFormation stack through which the VPN gateway will be created.  When deploying this stack, you set the parameter `pUseElasticIp` to `true` and supply a value for the `pEipAllocationId` parameter.
 
 #### Option 2: Deploy VPN gateway in Private Subnet and Use a NAT Gateway
 
-In this case, you discover the public IP address of the NAT Gateway and use it when configuring the remote side of the VPN connection.  When deploying this stack, you accept the default `false` setting for the `pUseElasticIp` parameter. Since the local side of the site-to-site VPN initiates the connection, the local strongSwan VON gateway will initiate the connection through the NAT Gateways public IP address.
+In this case, you discover the public IP address of the NAT Gateway and use it when configuring the remote side of the VPN connection.  When deploying this stack, you accept the default `false` setting for the `pUseElasticIp` parameter. Since the local side of the site-to-site VPN initiates the connection, the local strongSwan VPN gateway will initiate the connection through the NAT Gateways public IP address.
 
 ### 2. Determine VPN Tunnel Configuration Settings
 
-When using either AWS VPGs or TGWs for the remote end of the site-to-site VPN connection, a site-to-site VPN connection resource will be established in AWS on the remote site. Within the site-to-site VPN connection resource on the remote site, you can download a VPN configuration file that will provide you with much of the data required to deploy the local VPN gateway. In the AWS management console, see `VPC -> Site-to-Site VPN Connections`, select the connection of interest, click `Download` and select the `Generic` option for `Vendor` and download the configuration file.
+When using either AWS VGWs or TGWs for the remote end of the site-to-site VPN connection, a site-to-site VPN connection resource will be established in AWS on the remote site. Within the site-to-site VPN connection resource on the remote site, you can download a VPN configuration file that will provide you with much of the data required to deploy the local VPN gateway. In the AWS management console, see `VPC -> Site-to-Site VPN Connections`, select the connection of interest, click `Download` and select the `Generic` option for `Vendor` and download the configuration file.
 
 Review the data in this file in preparation for passing it as parameters to the CloudFormation stack in the next step.
 
 ### 3. Deploy VPN Gateway Stack
 
-In this step you'll create a CloudFormation stack using the [`vpn-gateway-strongswan.yml`](./vpn-gateway-strongswan.yml) template and configuration data obtained from the remote site's Site-to-Site VPN Connection resource.
+In this step you'll create a CloudFormation stack using the [`vpn-gateway-strongswan.yml`](https://raw.githubusercontent.com/aws-samples/vpn-gateway-strongwswan/master/vpn-gateway-strongswan.yml) template and configuration data obtained from the remote site's Site-to-Site VPN Connection resource.
 
-* Use the CloudFormation template to deploy a VPN gateway stack in a public subnet based on the [Parameters](#parameters) described below.
+* Use the CloudFormation template to deploy a VPN gateway stack in an appropriate subnet based on the [Parameters](#parameters) described below.
+  * Use the [AWS Management Console](https://console.aws.amazon.com/cloudformation/home) to access the CloudFormation service.
+  * Ensure that the desired AWS region is selected.
+  * Click "Create Stack" and select "With new resources".
+  * Click "Upload a template file"
+  * Use your browser to download the [`vpn-gateway-strongswan.yml`](https://raw.githubusercontent.com/aws-samples/vpn-gateway-strongwswan/master/vpn-gateway-strongswan.yml) CloudFormation template file to your local computer.
+  * Click "Choose file" to select the CloudFormation template file that you downloaded.
+  * Click "Next" to "Specify stack details".
+  * Enter a name for your new CloudFormation stack. For example, "vpn-gateway".
+  * Override and/or fill in the required parameters.  See [Parameters](#parameters) for details.
+  * Click "Next" to "Configure stack options".
+  * Click "Next" to review your stack settings.
+  * Click "Create stack".
 * Wait for creation of the stack to complete. Since the template uses a wait condition, the stack won't complete until strongSwan and other components have been configured and started.
 * Wait for several minutes after stack creation completes. Then monitor the Site-to-Site VPN Connection on the remote site to confirm that the two VPN tunnels have progressed from the `DOWN` state to the `UP` state.  If the VPN gateway configuration is correct, Tunnel 1 will come up first followed several minutes later by Tunnel 2.
 
-If the tunnels have not come up 3-5 minutes after creation of the VPN gateway stack completed, then see the Troubleshooting section below.
+If the tunnels have not come up 3-5 minutes after creation of the VPN gateway stack completed, then see the [Troubleshooting](#troubleshooting) section below.
 
 ### 4. Ensure Routing Tables and EC2 Security Groups Are in Place
 
@@ -189,7 +205,7 @@ After deploying the new VPN gateway stack, you will need to ensure that any loca
 
 ### Masking Source IP Addresses
 
-If you'd like the VPC in which the strongSwan VPN gateway is running to forward traffice from the VPN connection to either other VPCs via VPC Peering or onward via gateways such an Internet Gateway to NAT Gateway, you'll need to configure the VPN gateway to mask the original source IP address by using the VPN gateway's IP address.
+If you'd like the VPC in which the strongSwan VPN gateway is running to forward traffic from the VPN connection to either other VPCs via VPC Peering or onward via gateways such an Internet Gateway to NAT Gateway, you'll need to configure the VPN gateway to mask the original source IP address by using the VPN gateway's IP address.
 
 You can implement source network IP masking via an `iptables` command.  For example, the following command when run on the strongSwan VPN gatewy will mask the source IP address only for traffic whose destination IP address does not match the specified network. e.g. It will mask traffic destined for the Internet, but not for the local network. Presence of the `!` argument prior to the `-d` argument ensures that the all destinations other than the stated network will be subject to the masking rule.
 
