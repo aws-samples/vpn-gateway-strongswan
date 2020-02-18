@@ -265,8 +265,6 @@ See [TODO.md](./TODO.md) for an entry calling for the optional automation of sou
 
 ## Contributing
 
-See [TODO.md](./TODO.md) for enhancement ideas.
-
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the contribution process.
 
 File an issue in GitHub, ensure your changes pass `cfn-lint` tests and functionally work, before submitting a Pull Request (PR) for consideration.
