@@ -207,7 +207,7 @@ After deploying the new VPN gateway stack, you will need to ensure that any loca
 
 If you'd like the VPC in which the strongSwan VPN gateway is running to forward traffic from the VPN connection to either other VPCs via VPC Peering or onward via gateways such an Internet Gateway to NAT Gateway, you'll need to configure the VPN gateway to mask the original source IP address by using the VPN gateway's IP address.
 
-You can implement source network IP masking via an `iptables` command.  For example, the following command when run on the strongSwan VPN gatewy will mask the source IP address only for traffic whose destination IP address does not match the specified network. e.g. It will mask traffic destined for the Internet, but not for the local network. Presence of the `!` argument prior to the `-d` argument ensures that the all destinations other than the stated network will be subject to the masking rule.
+You can implement source network IP masking via an `iptables` command.  For example, the following command when run on the strongSwan VPN gateway will mask the source IP address only for traffic whose destination IP address does not match the specified network. e.g. It will mask traffic destined for the Internet, but not for the local network. Presence of the `!` argument prior to the `-d` argument ensures that the all destinations other than the stated network will be subject to the masking rule.
 
 ```
 $ sudo /sbin/iptables -t nat -A POSTROUTING -o eth0 ! -d 10.0.0.0/16 -j MASQUERADE
