@@ -130,22 +130,22 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |Parameter|Required|Description|Default|
 |---------|--------|-----------|-------|
 |**System Classification and Environment**| | | |
-|`pOrg`|Optional|As an example of using resurce naming standards, include the business organization in the names of resources including, for example, IAM roles.|`acme`|
-|`pSystem`|Optional|As an example of using resurce naming standards, include a system identifier in the names of resources including, for example, IAM roles..|`infra`|
+|`pOrg`|Optional|As an example of using resurce naming standards, include the business organization in the names of resources including, for example, IAM roles.|`example`|
+|`pSystem`|Optional|As an example of using resurce naming standards, include a system identifier in the names of resources including, for example, IAM roles..|`base`|
 |`pApp`|Optional|As an example of using resurce naming standards, include an application identifier in the names of resources including, for example, IAM roles.|`vpngw`|
-|`pEnvPurpose`|Optional|As an example of using resurce naming standards, include a purpose for this particulart instance of the stack in the names of resources including, for example, IAM roles.. For example, "dev1", "test", "1", etc.|None|
+|`pEnvPurpose`|Required|As an example of using resurce naming standards, include a purpose for this particulart instance of the stack in the names of resources including, for example, IAM roles.. For example, "dev1", "test", "1", etc.|None|
 |**VPN Tunnel 1**| | | |
 |`pTunnel1Psk`|Required|See the remote site's configuration for the "IPSec Tunnel #1" section and "Pre-Shared Key" value.|None|
-|`pTunnel1RemoteExternalIpAddress`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Outside IP Addresses" section and "Virtual Private Gateway" value.|None|
-|`pTunnel1RemoteInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Inside IP Addresses" section and "Virtual Private Gateway" value.|None|
-|`pTunnel1LocalInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Inside IP Addresses" section and "Customer Gateway" value.|None|
+|`pTunnel1VgwOutsideIpAddress`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Outside IP Addresses" section and "Virtual Private Gateway" value.|None|
+|`pTunnel1VgwInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Inside IP Addresses" section and "Virtual Private Gateway" value.|None|
+|`pTunnel1CgwInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Inside IP Addresses" section and "Customer Gateway" value.|None|
 |`pTunnel1BgpAsn`|Optional|See the remote site's configuration for the "BGP Configuration Options" and the "Virtual Private  Gateway ASN" value.|`64512`|
 |`pTunnel1BgpNeighborIpAddress`|Required|See the remote site's configuration for the "BGP Configuration Options" and the "Neighbor IP Address" value.|None|
 |**VPN Tunnel 2**| | | |
 |`pTunnel2Psk`|Required|See Tunnel 1.|None|
-|`pTunnel2RemoteExternalIpAddress`|Required|See Tunnel 1.|None|
-|`pTunnel2RemoteInsideCidr`|Required|See Tunnel 1.|None|
-|`pTunnel2LocalInsideCidr`|Required|See Tunnel 1.|None|
+|`pTunnel2VgwOutsideIpAddress`|Required|See Tunnel 1.|None|
+|`pTunnel2VgwInsideCidr`|Required|See Tunnel 1.|None|
+|`pTunnel2CgwInsideCidr`|Required|See Tunnel 1.|None|
 |`pTunnel2BgpAsn`|Optional|See Tunnel 1.|`64512`|
 |`pTunnel2BgpNeighborIpAddress`|Required|See Tunnel 1.|None|
 |**Local Network**| | | |

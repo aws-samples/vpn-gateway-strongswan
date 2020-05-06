@@ -21,18 +21,18 @@ Metadata:
         default: VPN Tunnel 1
       Parameters:
       - pTunnel1Psk
-      - pTunnel1RemoteExternalIpAddress
-      - pTunnel1RemoteInsideCidr
-      - pTunnel1LocalInsideCidr
+      - pTunnel1VgwOutsideIpAddress
+      - pTunnel1VgwInsideCidr
+      - pTunnel1CgwInsideCidr
       - pTunnel1BgpAsn
       - pTunnel1BgpNeighborIpAddress
     - Label:
         default: VPN Tunnel 2
       Parameters:
       - pTunnel2Psk
-      - pTunnel2RemoteExternalIpAddress
-      - pTunnel2RemoteInsideCidr
-      - pTunnel2LocalInsideCidr
+      - pTunnel2VgwOutsideIpAddress
+      - pTunnel2VgwInsideCidr
+      - pTunnel2CgwInsideCidr
       - pTunnel2BgpAsn
       - pTunnel2BgpNeighborIpAddress
     - Label:
@@ -62,12 +62,12 @@ Metadata:
 
       pTunnel1Psk:
         default: VPN Tunnel 1 Pre-Shared Key
-      pTunnel1RemoteExternalIpAddress:
-        default: VPN Tunnel 1 Remote External IP Address
-      pTunnel1RemoteInsideCidr:
-        default: VPN Tunnel 1 Remote Inside CIDR
-      pTunnel1LocalInsideCidr:
-        default: VPN Tunnel 1 Local Inside CIDR
+      pTunnel1VgwOutsideIpAddress:
+        default: VPN Tunnel 1 Virtual Private Gateway Outside IP Address
+      pTunnel1VgwInsideCidr:
+        default: VPN Tunnel 1 Virtual Private Gateway Inside CIDR
+      pTunnel1CgwInsideCidr:
+        default: VPN Tunnel 1 Customer Gateway Inside CIDR
       pTunnel1BgpAsn:
         default: VPN Tunnel 1 BGP ASN
       pTunnel1BgpNeighborIpAddress:
@@ -75,12 +75,12 @@ Metadata:
 
       pTunnel2Psk:
         default: VPN Tunnel 2 Pre-Shared Key
-      pTunnel2RemoteExternalIpAddress:
-        default: VPN Tunnel 2 Remote External IP Address
-      pTunnel2RemoteInsideCidr:
-        default: VPN Tunnel 2 Remote Inside CIDR
-      pTunnel2LocalInsideCidr:
-        default: VPN Tunnel 2 Local Inside CIDR
+      pTunnel2VgwOutsideIpAddress:
+        default: VPN Tunnel 2 Virtual Private Gateway Outside IP Address
+      pTunnel2VgwInsideCidr:
+        default: VPN Tunnel 2 Virtual Private Gateway Inside CIDR
+      pTunnel2CgwInsideCidr:
+        default: VPN Tunnel 2 Customer Gateway Inside CIDR
       pTunnel2BgpAsn:
         default: VPN Tunnel 2 BGP ASN
       pTunnel2BgpNeighborIpAddress:
@@ -108,12 +108,12 @@ Parameters:
   pOrg:
     Type: String
     Description: Used to qualify resource names
-    Default: acme
+    Default: example
 
   pSystem:
     Type: String
     Description: Used to qualify resource names
-    Default: infra
+    Default: base
 
   pApp:
     Type: String
@@ -129,17 +129,17 @@ Parameters:
     Description: VPN Tunnel 1 Pre-Shared Key
     Type: String
 
-  pTunnel1RemoteExternalIpAddress:
-    Description: VPN Tunnel 1 Remote External IP Address
+  pTunnel1VgwOutsideIpAddress:
+    Description: VPN Tunnel 1 Virtual Private Gateway Outside IP Address
     Type: String
 
-  pTunnel1RemoteInsideCidr:
-    Description: VPN Tunnel 1 Remote Inside CIDR
+  pTunnel1VgwInsideCidr:
+    Description: VPN Tunnel 1 Virtual Private Gateway Inside CIDR
     Type: String
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|3[0-8]))$ 
 
-  pTunnel1LocalInsideCidr:
-    Description: VPN Tunnel 1 Local Inside CIDR
+  pTunnel1CgwInsideCidr:
+    Description:  VPN Tunnel 1 Customer Gateway Inside CIDR
     Type: String
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|3[0-8]))$ 
 
@@ -156,17 +156,17 @@ Parameters:
     Description: VPN Tunnel 2 Pre-Shared Key
     Type: String
 
-  pTunnel2RemoteExternalIpAddress:
-    Description: VPN Tunnel 2 Remote External IP Address
+  pTunnel2VgwOutsideIpAddress:
+    Description: VPN Tunnel 2 Virtual Private Gateway Outside IP Address
     Type: String
 
-  pTunnel2RemoteInsideCidr:
-    Description: VPN Tunnel 2 Remote Inside CIDR
+  pTunnel2VgwInsideCidr:
+    Description: VPN Tunnel 2 Virtual Private Gateway Inside CIDR
     Type: String
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|3[0-8]))$ 
 
-  pTunnel2LocalInsideCidr:
-    Description: VPN Tunnel 2 Local Inside CIDR
+  pTunnel2CgwInsideCidr:
+    Description:  VPN Tunnel 2 Customer Gateway Inside CIDR
     Type: String
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|3[0-8]))$ 
   
@@ -247,27 +247,27 @@ Resources:
         - IpProtocol: udp
           FromPort: 500
           ToPort: 500
-          CidrIp: !Sub '${pTunnel1RemoteExternalIpAddress}/32'
+          CidrIp: !Sub '${pTunnel1VgwOutsideIpAddress}/32'
         - IpProtocol: udp
           FromPort: 500
           ToPort: 500
-          CidrIp: !Sub '${pTunnel2RemoteExternalIpAddress}/32'
+          CidrIp: !Sub '${pTunnel2VgwOutsideIpAddress}/32'
         - IpProtocol: udp
           FromPort: 4500
           ToPort: 4500
-          CidrIp: !Sub '${pTunnel1RemoteExternalIpAddress}/32'
+          CidrIp: !Sub '${pTunnel1VgwOutsideIpAddress}/32'
         - IpProtocol: udp
           FromPort: 4500
           ToPort: 4500
-          CidrIp: !Sub '${pTunnel2RemoteExternalIpAddress}/32'
+          CidrIp: !Sub '${pTunnel2VgwOutsideIpAddress}/32'
         - IpProtocol: '50'
-          CidrIp: !Sub '${pTunnel1RemoteExternalIpAddress}/32'
+          CidrIp: !Sub '${pTunnel1VgwOutsideIpAddress}/32'
         - IpProtocol: '50'
-          CidrIp: !Sub '${pTunnel2RemoteExternalIpAddress}/32'
+          CidrIp: !Sub '${pTunnel2VgwOutsideIpAddress}/32'
         - IpProtocol: '51'
-          CidrIp: !Sub '${pTunnel1RemoteExternalIpAddress}/32'
+          CidrIp: !Sub '${pTunnel1VgwOutsideIpAddress}/32'
         - IpProtocol: '51'
-          CidrIp: !Sub '${pTunnel2RemoteExternalIpAddress}/32'
+          CidrIp: !Sub '${pTunnel2VgwOutsideIpAddress}/32'
         - IpProtocol: '-1'
           FromPort: 0
           ToPort: 65535
@@ -468,13 +468,13 @@ Resources:
 
                 conn AWS-VPC-TUNNEL-1
                   left=%any
-                  right=${pTunnel1RemoteExternalIpAddress}
+                  right=${pTunnel1VgwOutsideIpAddress}
                   auto=start
                   mark=100
 
                 conn AWS-VPC-TUNNEL-2
                   left=%any
-                  right=${pTunnel2RemoteExternalIpAddress}
+                  right=${pTunnel2VgwOutsideIpAddress}
                   auto=start
                   mark=200
               mode: '000600'
@@ -506,13 +506,13 @@ Resources:
                 case "$PLUTO_CONNECTION" in
                   AWS-VPC-TUNNEL-1)
                     VTI_INTERFACE=vti1
-                    VTI_LOCALADDR=${pTunnel1LocalInsideCidr}
-                    VTI_REMOTEADDR=${pTunnel1RemoteInsideCidr}
+                    VTI_LOCALADDR=${pTunnel1CgwInsideCidr}
+                    VTI_REMOTEADDR=${pTunnel1VgwInsideCidr}
                     ;;
                   AWS-VPC-TUNNEL-2)
                     VTI_INTERFACE=vti2
-                    VTI_LOCALADDR=${pTunnel2LocalInsideCidr}
-                    VTI_REMOTEADDR=${pTunnel2RemoteInsideCidr}
+                    VTI_LOCALADDR=${pTunnel2CgwInsideCidr}
+                    VTI_REMOTEADDR=${pTunnel2VgwInsideCidr}
                     ;;
                 esac
                 
@@ -541,8 +541,8 @@ Resources:
               group: root
             /etc/strongswan/ipsec.secrets:
               content: !Sub |
-                ${pTunnel1RemoteExternalIpAddress} : PSK "${pTunnel1Psk}"
-                ${pTunnel2RemoteExternalIpAddress} : PSK "${pTunnel2Psk}"
+                ${pTunnel1VgwOutsideIpAddress} : PSK "${pTunnel1Psk}"
+                ${pTunnel2VgwOutsideIpAddress} : PSK "${pTunnel2Psk}"
               mode: '000600'
               owner: root
               group: root
