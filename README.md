@@ -131,7 +131,7 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |---------|--------|-----------|-------|
 |**System Classification and Environment**| | | |
 |`pOrg`|Optional|As an example of using resurce naming standards, include the business organization in the names of resources including, for example, IAM roles.|`example`|
-|`pSystem`|Optional|As an example of using resurce naming standards, include a system identifier in the names of resources including, for example, IAM roles..|`base`|
+|`pSystem`|Optional|As an example of using resurce naming standards, include a system identifier in the names of resources including, for example, IAM roles..|`infra`|
 |`pApp`|Optional|As an example of using resurce naming standards, include an application identifier in the names of resources including, for example, IAM roles.|`vpngw`|
 |`pEnvPurpose`|Required|As an example of using resurce naming standards, include a purpose for this particulart instance of the stack in the names of resources including, for example, IAM roles.. For example, "dev1", "test", "1", etc.|None|
 |**VPN Tunnel 1**| | | |
