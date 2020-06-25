@@ -113,7 +113,7 @@ Parameters:
   pSystem:
     Type: String
     Description: Used to qualify resource names
-    Default: base
+    Default: infra
 
   pApp:
     Type: String
