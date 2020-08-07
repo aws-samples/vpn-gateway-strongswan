@@ -137,25 +137,24 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |**VPN Tunnel 1**| | | |
 |`pTunnel1Psk`|Required|See the remote site's configuration for the "IPSec Tunnel #1" section and "Pre-Shared Key" value.|None|
 |`pTunnel1VgwOutsideIpAddress`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Outside IP Addresses" section and "Virtual Private Gateway" value.|None|
-|`pTunnel1VgwInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Inside IP Addresses" section and "Virtual Private Gateway" value.|None|
 |`pTunnel1CgwInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Inside IP Addresses" section and "Customer Gateway" value.|None|
-|`pTunnel1BgpAsn`|Optional|See the remote site's configuration for the "BGP Configuration Options" and the "Virtual Private  Gateway ASN" value.|`64512`|
+|`pTunnel1VgwInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Inside IP Addresses" section and "Virtual Private Gateway" value.|None|
+|`pTunnel1VgwBgpAsn`|Optional|See the remote site's configuration for the "BGP Configuration Options" and the "Virtual Private  Gateway ASN" value.|`64512`|
 |`pTunnel1BgpNeighborIpAddress`|Required|See the remote site's configuration for the "BGP Configuration Options" and the "Neighbor IP Address" value.|None|
 |**VPN Tunnel 2**| | | |
 |`pTunnel2Psk`|Required|See Tunnel 1.|None|
 |`pTunnel2VgwOutsideIpAddress`|Required|See Tunnel 1.|None|
-|`pTunnel2VgwInsideCidr`|Required|See Tunnel 1.|None|
 |`pTunnel2CgwInsideCidr`|Required|See Tunnel 1.|None|
-|`pTunnel2BgpAsn`|Optional|See Tunnel 1.|`64512`|
+|`pTunnel2VgwInsideCidr`|Required|See Tunnel 1.|None|
+|`pTunnel2VgwBgpAsn`|Optional|See Tunnel 1.|`64512`|
 |`pTunnel2BgpNeighborIpAddress`|Required|See Tunnel 1.|None|
 |**Local Network**| | | |
 |`pVpcId`|Required|The VPC in which the VPN gateway is to be deployed.|None|
 |`pVpcCidr`|Required|The CIDR block of the local VPC. Used to advertise via BGP routing information to the remote site.|None|
 |`pSubnetId`|Required|The subnet in which the VPN gateway is to be deployed.|None|
-|`pUseElasticIp`|Optional|Use elastic IP address?|`false`|
+|`pUseElasticIp`|Optional|Use elastic IP address?|`true`|
 |`pEipAllocationId`|Conditional|The allocation ID of the Elastic IP address that is to be associated with the VPN gateway. Required when `pUseElasticIP` = `true`|None|
 |`pLocalBgpAsn`|Optional|The BGP Autonomous System Number (ASN) used to represent the local end of the site-to-site VPN connection.|`65000`|
-|`pTunnel1BgpNeighborIpAddress`|Required|See the remote site's configuration.|None|
 |**EC2 Instance**| | | |
 |`pAmiId`|Optional|The ID of the AMI to use for the VPN gateway. By default this Systems Manager Parameter Store key is used to lookup the latest version of the referenced AMI for use in the current region.|`/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-ebs`|
 |`pInstanceType`|Optional|The EC2 instance type to use for the VPN gateway.|`t3a.micro`|

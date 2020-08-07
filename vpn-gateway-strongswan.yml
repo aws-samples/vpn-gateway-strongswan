@@ -22,18 +22,18 @@ Metadata:
       Parameters:
       - pTunnel1Psk
       - pTunnel1VgwOutsideIpAddress
-      - pTunnel1VgwInsideCidr
-      - pTunnel1CgwInsideCidr
-      - pTunnel1BgpAsn
+      - pTunnel1CgwInsideIpAddress
+      - pTunnel1VgwInsideIpAddress
+      - pTunnel1VgwBgpAsn
       - pTunnel1BgpNeighborIpAddress
     - Label:
         default: VPN Tunnel 2
       Parameters:
       - pTunnel2Psk
       - pTunnel2VgwOutsideIpAddress
-      - pTunnel2VgwInsideCidr
-      - pTunnel2CgwInsideCidr
-      - pTunnel2BgpAsn
+      - pTunnel2CgwInsideIpAddress
+      - pTunnel2VgwInsideIpAddress
+      - pTunnel2VgwBgpAsn
       - pTunnel2BgpNeighborIpAddress
     - Label:
         default: Local Network Configuration
@@ -64,12 +64,12 @@ Metadata:
         default: VPN Tunnel 1 Pre-Shared Key
       pTunnel1VgwOutsideIpAddress:
         default: VPN Tunnel 1 Virtual Private Gateway Outside IP Address
-      pTunnel1VgwInsideCidr:
-        default: VPN Tunnel 1 Virtual Private Gateway Inside CIDR
-      pTunnel1CgwInsideCidr:
-        default: VPN Tunnel 1 Customer Gateway Inside CIDR
-      pTunnel1BgpAsn:
-        default: VPN Tunnel 1 BGP ASN
+      pTunnel1CgwInsideIpAddress:
+        default: VPN Tunnel 1 Customer Gateway Inside IP Address
+      pTunnel1VgwInsideIpAddress:
+        default: VPN Tunnel 1 Virtual Private Gateway Inside IP Address
+      pTunnel1VgwBgpAsn:
+        default: VPN Tunnel 1 Virtual Private Gateway BGP ASN
       pTunnel1BgpNeighborIpAddress:
         default: VPN Tunnel 1 BGP Neighbor IP Address
 
@@ -77,12 +77,12 @@ Metadata:
         default: VPN Tunnel 2 Pre-Shared Key
       pTunnel2VgwOutsideIpAddress:
         default: VPN Tunnel 2 Virtual Private Gateway Outside IP Address
-      pTunnel2VgwInsideCidr:
-        default: VPN Tunnel 2 Virtual Private Gateway Inside CIDR
-      pTunnel2CgwInsideCidr:
-        default: VPN Tunnel 2 Customer Gateway Inside CIDR
-      pTunnel2BgpAsn:
-        default: VPN Tunnel 2 BGP ASN
+      pTunnel2CgwInsideIpAddress:
+        default: VPN Tunnel 2 Customer Gateway Inside IP Address
+      pTunnel2VgwInsideIpAddress:
+        default: VPN Tunnel 2 Virtual Private Gateway Inside IP Address
+      pTunnel2VgwBgpAsn:
+        default: VPN Tunnel 2 Virtual Private Gateway BGP ASN
       pTunnel2BgpNeighborIpAddress:
         default: VPN Tunnel 2 BGP Neighbor IP Address
 
@@ -124,6 +124,7 @@ Parameters:
     Type: String
     Description: Used to qualify resource names. 10 characters max.
     AllowedPattern: '^[a-zA-Z0-9-_]{1,10}$'
+    Default: test
   
   pTunnel1Psk:
     Description: VPN Tunnel 1 Pre-Shared Key
@@ -133,18 +134,18 @@ Parameters:
     Description: VPN Tunnel 1 Virtual Private Gateway Outside IP Address
     Type: String
 
-  pTunnel1VgwInsideCidr:
-    Description: VPN Tunnel 1 Virtual Private Gateway Inside CIDR
+  pTunnel1CgwInsideIpAddress:
+    Description:  VPN Tunnel 1 Customer Gateway Inside IP Address
     Type: String
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|3[0-8]))$ 
 
-  pTunnel1CgwInsideCidr:
-    Description:  VPN Tunnel 1 Customer Gateway Inside CIDR
+  pTunnel1VgwInsideIpAddress:
+    Description: VPN Tunnel 1 Virtual Private Gateway Inside IP Address
     Type: String
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|3[0-8]))$ 
 
-  pTunnel1BgpAsn:
-    Description: VPN Tunnel 1 BGP ASN
+  pTunnel1VgwBgpAsn:
+    Description: VPN Tunnel 1 Virtual Private Gateway BGP ASN
     Type: Number
     Default: 64512
 
@@ -160,25 +161,25 @@ Parameters:
     Description: VPN Tunnel 2 Virtual Private Gateway Outside IP Address
     Type: String
 
-  pTunnel2VgwInsideCidr:
-    Description: VPN Tunnel 2 Virtual Private Gateway Inside CIDR
+  pTunnel2CgwInsideIpAddress:
+    Description:  VPN Tunnel 2 Customer Gateway Inside IP Address
     Type: String
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|3[0-8]))$ 
 
-  pTunnel2CgwInsideCidr:
-    Description:  VPN Tunnel 2 Customer Gateway Inside CIDR
+  pTunnel2VgwInsideIpAddress:
+    Description: VPN Tunnel 2 Virtual Private Gateway Inside IP Address
     Type: String
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|3[0-8]))$ 
   
-  pTunnel2BgpAsn:
-    Description: VPN Tunnel 2 BGP ASN
+  pTunnel2VgwBgpAsn:
+    Description: VPN Tunnel 2 Virtual Private Gateway BGP ASN
     Type: Number
     Default: 64512
     
   pUseElasticIp:
     Type: String
     Description: Whether Elastic IP address is to be used.
-    Default: false
+    Default: true
     AllowedValues: [true, false]
 
   pEipAllocationId:
@@ -506,13 +507,13 @@ Resources:
                 case "$PLUTO_CONNECTION" in
                   AWS-VPC-TUNNEL-1)
                     VTI_INTERFACE=vti1
-                    VTI_LOCALADDR=${pTunnel1CgwInsideCidr}
-                    VTI_REMOTEADDR=${pTunnel1VgwInsideCidr}
+                    VTI_LOCALADDR=${pTunnel1CgwInsideIpAddress}
+                    VTI_REMOTEADDR=${pTunnel1VgwInsideIpAddress}
                     ;;
                   AWS-VPC-TUNNEL-2)
                     VTI_INTERFACE=vti2
-                    VTI_LOCALADDR=${pTunnel2CgwInsideCidr}
-                    VTI_REMOTEADDR=${pTunnel2VgwInsideCidr}
+                    VTI_LOCALADDR=${pTunnel2CgwInsideIpAddress}
+                    VTI_REMOTEADDR=${pTunnel2VgwInsideIpAddress}
                     ;;
                 esac
                 
@@ -582,8 +583,8 @@ Resources:
                 router bgp ${pLocalBgpAsn}
                   bgp router-id {PRIVATE_IP} 
                   network ${pVpcCidr}
-                  neighbor ${pTunnel1BgpNeighborIpAddress} remote-as ${pTunnel1BgpAsn}
-                  neighbor ${pTunnel2BgpNeighborIpAddress} remote-as ${pTunnel2BgpAsn}
+                  neighbor ${pTunnel1BgpNeighborIpAddress} remote-as ${pTunnel1VgwBgpAsn}
+                  neighbor ${pTunnel2BgpNeighborIpAddress} remote-as ${pTunnel2VgwBgpAsn}
                   neighbor ${pTunnel2BgpNeighborIpAddress} route-map RM_LOWER_PRIORITY out
                 !
                 route-map RM_LOWER_PRIORITY permit 10
