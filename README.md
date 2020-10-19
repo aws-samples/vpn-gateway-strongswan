@@ -117,33 +117,35 @@ You can either use the AWS management console or an included helper script and t
 
 #### Use AWS Management Console
 
-* Use the CloudFormation template to deploy a VPN gateway stack in an appropriate subnet based on the [Parameters](#parameters) described below.
-  * Use the [AWS Management Console](https://console.aws.amazon.com/cloudformation/home) to access the CloudFormation service.
-  * Ensure that the desired AWS region is selected.
-  * Click "Create Stack" and select "With new resources".
-  * Click "Upload a template file"
-  * Use your browser to download the [`vpn-gateway-strongswan.yml`](https://raw.githubusercontent.com/aws-samples/vpn-gateway-strongwswan/master/vpn-gateway-strongswan.yml) CloudFormation template file to your local computer.
-  * Click "Choose file" to select the CloudFormation template file that you downloaded.
-  * Click "Next" to "Specify stack details".
-  * Enter a name for your new CloudFormation stack. For example, "vpn-gateway".
-  * Override and/or fill in the required parameters.  See [Parameters](#parameters) for details.
-  * Click "Next" to "Configure stack options".
-  * Click "Next" to review your stack settings.
-  * Click "Create stack".
+Use the CloudFormation template to deploy a VPN gateway stack in an appropriate subnet based on the [Parameters](#parameters) described below.
+
+1. Use the [AWS Management Console](https://console.aws.amazon.com/cloudformation/home) to access the CloudFormation service.
+1. Ensure that the desired AWS region is selected.
+1. Select "Create Stack" and select "With new resources".
+1. Select "Upload a template file"
+
+1. Use your browser to download the [`vpn-gateway-strongswan.yml`](https://raw.githubusercontent.com/aws-samples/vpn-gateway-strongwswan/master/vpn-gateway-strongswan.yml) CloudFormation template file to your local computer.
+1. Select "Choose file" to select the CloudFormation template file that you downloaded.
+1. Select "Next" to "Specify stack details".
+1. Enter a name for your new CloudFormation stack. For example, "vpn-gateway".
+1. Override and/or fill in the required parameters.  See [Parameters](#parameters) for details.
+1. Select "Next" to "Configure stack options".
+1. Select "Next" to review your stack settings.
+1. Select "Create stack".
 
 #### Use AWS CLI
 
-If you have the AWS CLI installed, you might find it easier to use included shell script `manage-stack` to easily create the stack.
+If you have the AWS CLI installed, you might find it easier to use the included shell script `manage-stack` to create the stack.
 
 1. Clone this repository to your local system on which you have the AWS CLI installed.
-2. Customize one of the `template-parameters-*.json` files containing example sets of parameters for your stack. Choose the file based on whether you're using PSK- or certificate-based authentication.
+2. Customize one of the `template-parameters-*.json` files containing example sets of parameters for your stack.
 3. Execute the `manage-stack` wrapper script to create the stack. See the script for the supported options.
 
 ```
 $ ./manage-stack -e mystack1 template-parameters-certificate-auth.json
 ```
 
-You can monitor stack creation progress via the AWS management console.
+Monitor the progress of stack creation via the AWS management console.
 
 #### After Starting the Create Stack Process
 
@@ -244,6 +246,99 @@ Verify correctness of the following configurations on both sides of the site-to-
 * Route tables.
 
 Consider using `tcpdump` on the VPN gateway EC2 instance to see if traffic is being routed through the gateway.
+
+## Inspecting the strongSwan VPN Gateway EC2 Instance
+
+If any of the following log files are not present in CloudWatch Logs: `charon.log`, `zebra.log`, `bgpd.log`, start a terminal session with the VPN gateway instance and execute a command to display error messages associated with services starting up on the strongSwan EC2 instance.
+
+### Accessing a Terminal Session
+
+Since the CloudFormation stack configures the VPN gateway EC2 instance to support terminal access through AWS Systems Manager Session Manager, you can easily connect to the strongSwan EC2 instance via the EC2 portion of the AWS management console.
+
+1. Access the EC2 service of the AWS Management Console
+1. Choose the strongSwan EC2 instance. For example, infra-vpngw-test
+1. Choose "Connect" in the upper portion of the console
+1. Choose the "Session Manager" option
+1. Choose "Connect"
+
+You should be presented with a terminal session of the EC2 instance.
+
+### Inspecting strongSwan
+
+Use the following commands to display errors associated with starting the following services:
+
+```
+$ systemctl status strongswan
+
+$ systemctl status zebra
+
+$ systemctl status bgpd
+```
+
+You can review the status of the strongSwan application via sudo strongswan status command. Execution of this command should show that both tunnels are connected:
+
+```
+$ sudo strongswan status
+
+Security Associations (2 up, 0 connecting):
+AWS-VPC-TUNNEL-1[135]: ESTABLISHED 2 hours ago, 10.0.0.221[10.0.0.221]...18.222.98.126[18.222.98.126]
+AWS-VPC-TUNNEL-1{1358}:  REKEYED, TUNNEL, reqid 1, expires in 6 minutes
+AWS-VPC-TUNNEL-1{1358}:   0.0.0.0/0 === 0.0.0.0/0
+AWS-VPC-TUNNEL-1{1360}:  INSTALLED, TUNNEL, reqid 1, ESP in UDP SPIs: c2217636_i c2fc4ee3_o
+AWS-VPC-TUNNEL-1{1360}:   0.0.0.0/0 === 0.0.0.0/0
+AWS-VPC-TUNNEL-2[134]: ESTABLISHED 6 hours ago, 10.0.0.221[10.0.0.221]...52.15.138.189[52.15.138.189]
+AWS-VPC-TUNNEL-2{1357}:  REKEYED, TUNNEL, reqid 8, expires in 4 minutes
+AWS-VPC-TUNNEL-2{1357}:   0.0.0.0/0 === 0.0.0.0/0
+AWS-VPC-TUNNEL-2{1359}:  INSTALLED, TUNNEL, reqid 8, ESP in UDP SPIs: cff85483_i 87052d38_o
+AWS-VPC-TUNNEL-2{1359}:   0.0.0.0/0 === 0.0.0.0/0
+```
+
+If you're using certificated-based authentication, you can inspect the certificates loaded by strongSwan:
+
+```
+# strongswan listcerts  # list the public certificates
+
+# strongswan listcacerts # list the CA certificates
+```
+
+You can inspect the BGP routes that Quagga knows about by executing the `sudo vtysh` command followed by the `show ip bgp summary` subcommand. In the following example, the BGP tunnel neighors are listed:
+
+```
+$ sudo vtysh
+
+Hello, this is Quagga (version 0.99.22.4).
+Copyright 1996-2005 Kunihiro Ishiguro, et al.
+
+ip-10-0-0-221.corp.ckamps-acme.com#  show ip bgp summary
+
+BGP router identifier 10.0.0.221, local AS number 65000
+RIB entries 3, using 336 bytes of memory
+Peers 2, using 9120 bytes of memory
+
+Neighbor        V    AS MsgRcvd MsgSent   TblVer  InQ OutQ Up/Down  State/PfxRcd
+169.254.54.17   4 64512  182713  182714        0    0    0 03w0d03h        1
+169.254.227.237 4 64512  182593  182632        0    0    0 14:36:47        1
+
+Total number of neighbors 2
+```
+
+Next, you can inspect the routes by executing the `show ip route` subcommand. In the following example, 10.4.0.0/19 represents the route advertised by the transit gateway via BGP.
+
+```
+# show ip route
+
+Codes: K - kernel route, C - connected, S - static, R - RIP,
+       O - OSPF, I - IS-IS, B - BGP, A - Babel,
+       > - selected route, * - FIB route
+
+K>* 0.0.0.0/0 via 10.0.0.1, eth0
+C>* 10.0.0.0/24 is directly connected, eth0
+B>* 10.4.0.0/19 [20/100] via 169.254.54.17, vti1, src 10.0.0.221, 03w0d03h
+C>* 127.0.0.0/8 is directly connected, lo
+C>* 169.254.54.16/30 is directly connected, vti1
+K>* 169.254.169.254/32 is directly connected, eth0
+C>* 169.254.227.236/30 is directly connected, vti2
+```
 
 ## Advanced Usage
 
