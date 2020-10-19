@@ -86,7 +86,7 @@ fi
 aws cloudformation ${CMD} \
                      --stack-name ${STACK_NAME} \
                      --template-body file://./${TEMPLATE} \
-                     --parameters file://./${1} \
+                     --parameters file://${1} \
                      --capabilities CAPABILITY_NAMED_IAM \
                      --region ${REGION} \
                      ${PROFILE}

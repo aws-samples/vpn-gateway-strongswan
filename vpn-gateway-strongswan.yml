@@ -180,6 +180,15 @@ Parameters:
     Type: String
     Default: ''
 
+# To Do: Implement a more secure approach to obtaining the following passphrase.
+# The solution to be implemented:
+#  1. Add the passphrase as a secret in AWS Secrets Manager
+#  2. Pass the name of the secret in place of the following parameter
+#  3. Use one of the cfn-init scripts to  obtain the secret via the AWS CLI
+#  4. Update the associated configuration file. 
+#
+# The IAM role will need to be enhanced to add a permission to allow for the retrieval of the secret.
+
   pClientPrivateCertPassphrase:
     Description: Client Private Certificate Passphrase. Required for certificate-based authentication.
     Type: String
