@@ -9,6 +9,7 @@ Even if you don’t have a need to demonstrate integration with AWS site-to-site
 * [Usage](#usage)
 * [Parameters](#parameters)
 * [Troubleshooting](#troubleshooting)
+* [Inspecting the strongSwan VPN Gateway EC2 Instance](#inspecting-the-strongswan-vpn-gateway-ec2-instance)
 * [Advanced Usage](#advanced-usage)
 * [Contributing](#contributing)
 * [License](#license)
