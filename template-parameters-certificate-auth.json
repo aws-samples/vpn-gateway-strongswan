@@ -1,0 +1,122 @@
+[
+  {
+    "ParameterKey": "pOrg",
+    "ParameterValue": "example"
+  },
+  {
+    "ParameterKey": "pSystem",
+    "ParameterValue": "infra"
+  },
+  {
+    "ParameterKey": "pApp",
+    "ParameterValue": "vpngw"
+  },
+  {
+    "ParameterKey": "pEnvPurpose",
+    "ParameterValue": "test14"
+  },
+  {
+    "ParameterKey": "pAuthType",
+    "ParameterValue": "pubkey"
+  },
+  {
+    "ParameterKey": "pCertBucket",
+    "ParameterValue": "example-certs"
+  },
+  {
+    "ParameterKey": "pClientPublicCert",
+    "ParameterValue": "example-cloud-vpn-cert.pem"
+  },
+  {
+    "ParameterKey": "pClientPrivateCert",
+    "ParameterValue": "example-cloud-vpn-private-key.pem"
+  },
+  {
+    "ParameterKey": "pClientPrivateCertPassphrase",
+    "ParameterValue": "..."
+  },
+  {
+    "ParameterKey": "pRootCaPublicCert",
+    "ParameterValue": "example-cloud-root-ca.pem"
+  },
+  {
+    "ParameterKey": "pSubordinateCaPublicCert",
+    "ParameterValue": "example-cloud-subordinate-ca.pem"
+  },
+  {
+    "ParameterKey": "pTunnel1VgwCertCommonName",
+    "ParameterValue": "vpn-0nnn.endpoint-0"
+  },
+  {
+    "ParameterKey": "pTunnel1VgwOutsideIpAddress",
+    "ParameterValue": "n.n.n.n"
+  },
+  {
+    "ParameterKey": "pTunnel1CgwInsideIpAddress",
+    "ParameterValue": "n.n.n.n/30"
+  },
+  {
+    "ParameterKey": "pTunnel1VgwInsideIpAddress",
+    "ParameterValue": "n.n.n.n/30"
+  },
+  {
+    "ParameterKey": "pTunnel1VgwBgpAsn",
+    "ParameterValue": "64512"
+  },
+  {
+    "ParameterKey": "pTunnel1BgpNeighborIpAddress",
+    "ParameterValue": "n.n.n.n"
+  },
+  {
+    "ParameterKey": "pTunnel2VgwCertCommonName",
+    "ParameterValue": "vpn-0nnn.endpoint-1"
+  },
+  {
+    "ParameterKey": "pTunnel2VgwOutsideIpAddress",
+    "ParameterValue": "n.n.n.n"
+  },
+  {
+    "ParameterKey": "pTunnel2CgwInsideIpAddress",
+    "ParameterValue": "n.n.n.n/30"
+  },
+  {
+    "ParameterKey": "pTunnel2VgwInsideIpAddress",
+    "ParameterValue": "n.n.n.n/30"
+  },
+  {
+    "ParameterKey": "pTunnel2VgwBgpAsn",
+    "ParameterValue": "64512"
+  },
+  {
+    "ParameterKey": "pTunnel2BgpNeighborIpAddress",
+    "ParameterValue": "n.n.n.n"
+  },
+  {
+    "ParameterKey": "pVpcId",
+    "ParameterValue": "vpc-0nnn"
+  },
+  {
+    "ParameterKey": "pVpcCidr",
+    "ParameterValue": "10.0.0.0/16"
+  },
+  {
+    "ParameterKey": "pSubnetId",
+    "ParameterValue": "subnet-0nnn"
+  },
+  {
+    "ParameterKey": "pUseElasticIp",
+    "ParameterValue": "true"
+  },
+  {
+    "ParameterKey": "pEipAllocationId",
+    "ParameterValue": "eipalloc-0nnn"
+  },
+  {
+    "ParameterKey": "pLocalBgpAsn",
+    "ParameterValue": "65000"
+  },
+  {
+    "ParameterKey": "pInstanceType",
+    "ParameterValue": "t3a.micro"
+  }
+]

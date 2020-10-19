@@ -18,9 +18,20 @@ Metadata:
       Parameters:
       - pEnvPurpose
     - Label:
+        default: Authentication
+      Parameters:
+      - pAuthType
+      - pCertBucket
+      - pClientPublicCert
+      - pClientPrivateCert
+      - pClientPrivateCertPassphrase
+      - pRootCaPublicCert
+      - pSubordinateCaPublicCert
+    - Label:
         default: VPN Tunnel 1
       Parameters:
       - pTunnel1Psk
+      - pTunnel1VgwCertCommonName
       - pTunnel1VgwOutsideIpAddress
       - pTunnel1CgwInsideIpAddress
       - pTunnel1VgwInsideIpAddress
@@ -30,6 +41,7 @@ Metadata:
         default: VPN Tunnel 2
       Parameters:
       - pTunnel2Psk
+      - pTunnel2VgwCertCommonName
       - pTunnel2VgwOutsideIpAddress
       - pTunnel2CgwInsideIpAddress
       - pTunnel2VgwInsideIpAddress
@@ -60,8 +72,25 @@ Metadata:
       pEnvPurpose:
         default: Environment Purpose
 
+      pAuthType:
+        default: "Authentication type: 'psk' - Pre-shared key or 'pubkey' - Certificate"
+      pCertBucket:
+        default: S3 Bucket Containing Certificates
+      pClientPublicCert:
+        default: Client Public Certificate (S3 key)
+      pClientPrivateCert:
+        default: Client Private Certificate (S3 key)
+      pClientPrivateCertPassphrase:
+        default: Client Private Certificate Passphrase
+      pRootCaPublicCert:
+        default: Root CA Public Certificate (S3 key)
+      pSubordinateCaPublicCert:
+        default: Subordinate CA Public Certificate (S3 key)
+
       pTunnel1Psk:
         default: VPN Tunnel 1 Pre-Shared Key
+      pTunnel1VgwCertCommonName:
+        default: VPN Tunnel 1 Virtual Private Gateway Common Name (CN) - Certificate Authentication. e.g vpn-07..78.endpoint-0
       pTunnel1VgwOutsideIpAddress:
         default: VPN Tunnel 1 Virtual Private Gateway Outside IP Address
       pTunnel1CgwInsideIpAddress:
@@ -75,6 +104,8 @@ Metadata:
 
       pTunnel2Psk:
         default: VPN Tunnel 2 Pre-Shared Key
+      pTunnel2VgwCertCommonName:
+        default: VPN Tunnel 2 Virtual Private Gateway Common Name (CN) - Certificate Authentication. e.g vpn-07..78.endpoint-1
       pTunnel2VgwOutsideIpAddress:
         default: VPN Tunnel 2 Virtual Private Gateway Outside IP Address
       pTunnel2CgwInsideIpAddress:
@@ -125,10 +156,54 @@ Parameters:
     Description: Used to qualify resource names. 10 characters max.
     AllowedPattern: '^[a-zA-Z0-9-_]{1,10}$'
     Default: test
-  
-  pTunnel1Psk:
-    Description: VPN Tunnel 1 Pre-Shared Key
+
+  pAuthType:
     Type: String
+    Description: "Authentication type: 'psk' - Pre-shared key or 'pubkey' - Certificate"
+    Default: psk
+    AllowedValues:
+      - psk
+      - pubkey
+
+  pCertBucket:
+    Description: S3 Bucket Containing Certificates. Required for certificate-based authentication.
+    Type: String
+    Default: ''
+
+  pClientPublicCert:
+    Description: Client Public Certificate (S3 key). Required for certificate-based authentication.
+    Type: String
+    Default: ''
+  
+  pClientPrivateCert:
+    Description: Client Private Certificate (S3 key). Required for certificate-based authentication.
+    Type: String
+    Default: ''
+
+  pClientPrivateCertPassphrase:
+    Description: Client Private Certificate Passphrase. Required for certificate-based authentication.
+    Type: String
+    Default: ''
+
+  pRootCaPublicCert:
+    Description: Root CA Public Certificate (S3 key). Required for certificate-based authentication.
+    Type: String
+    Default: ''
+
+  pSubordinateCaPublicCert:
+    Description: Subordinate CA Public Certificate (S3 key). Required for certificate-based authentication.
+    Type: String
+    Default: ''
+
+  pTunnel1Psk:
+    Description: VPN Tunnel 1 Pre-Shared Key. Required for PSK-based authentication.
+    Type: String
+    Default: ''
+
+  pTunnel1VgwCertCommonName:
+    Description: VPN Tunnel 1 Virtual Private Gateway Common Name (CN). Required for certificate-based authentication. e.g vpn-07..78.endpoint-1
+    Type: String
+    Default: ''
 
   pTunnel1VgwOutsideIpAddress:
     Description: VPN Tunnel 1 Virtual Private Gateway Outside IP Address
@@ -154,8 +229,14 @@ Parameters:
     Type: String
   
   pTunnel2Psk:
-    Description: VPN Tunnel 2 Pre-Shared Key
+    Description: VPN Tunnel 2 Pre-Shared Key. Required for PSK-based authentication.
     Type: String
+    Default: ''
+
+  pTunnel2VgwCertCommonName:
+    Description: VPN Tunnel 2 Virtual Private Gateway Common Name (CN). Required for certificate-based authentication. e.g vpn-07..78.endpoint-1
+    Type: String
+    Default: ''
 
   pTunnel2VgwOutsideIpAddress:
     Description: VPN Tunnel 2 Virtual Private Gateway Outside IP Address
@@ -175,7 +256,7 @@ Parameters:
     Description: VPN Tunnel 2 Virtual Private Gateway BGP ASN
     Type: Number
     Default: 64512
-    
+
   pUseElasticIp:
     Type: String
     Description: Whether Elastic IP address is to be used.
@@ -185,6 +266,7 @@ Parameters:
   pEipAllocationId:
     Description: Elastic IP Address Alocation ID
     Type: String
+    Default: ''
 
   pLocalBgpAsn:
     Description: Local VPN Gateway's BGP ASN
@@ -235,6 +317,7 @@ Rules:
         AssertDescription: All subnets must in the VPC
 
 Conditions:
+  cUseCertAuth:  !Equals [ !Ref 'pAuthType', 'pubkey' ]
   cUseElasticIp: !Equals [ !Ref 'pUseElasticIp', true ]
 
 Resources:
@@ -298,19 +381,31 @@ Resources:
             /opt/aws/bin/cfn-init -v \
                 --stack ${AWS::StackName} \
                 --resource rLaunchTemplate \
-                --configsets All \
+                --configsets ${pAuthType} \
                 --region ${AWS::Region}
 
             /opt/aws/bin/cfn-signal -e $? \
                 '${rVpnGatewayWaitHandle}'
     Metadata:
+      AWS::CloudFormation::Authentication:
+        S3BucketAccessCredential:
+          type: "S3"
+          roleName: !Ref rRole
       AWS::CloudFormation::Init:
         configSets:
-          All:
+          psk:
             - 01-ConfigureCloudWatchMetrics
             - 02-ConfigureCloudWatchLogsAgent
             - 03-InstallEpel
-            - 04-ConfigureVpnGateway
+            - 04-ConfigureVpnGatewayConfig
+            - 06-ConfigureVpnGatewayCommands
+          pubkey:
+            - 01-ConfigureCloudWatchMetrics
+            - 02-ConfigureCloudWatchLogsAgent
+            - 03-InstallEpel
+            - 04-ConfigureVpnGatewayConfig
+            - 05-ConfigureVpnGatewayCertFiles
+            - 06-ConfigureVpnGatewayCommands
         01-ConfigureCloudWatchMetrics:
           packages:
             yum:
@@ -410,7 +505,7 @@ Resources:
           commands:
             01-install-epel:
               command: amazon-linux-extras install epel -y
-        04-ConfigureVpnGateway:
+        04-ConfigureVpnGatewayConfig:
           packages:
             yum:
               strongswan: []
@@ -442,42 +537,69 @@ Resources:
               owner: root
               group: root
             /etc/strongswan/ipsec.conf:
-              content: !Sub |
-                conn %default
-                  leftauth=psk
-                  rightauth=psk
-                  ike=aes256-sha256-modp2048s256,aes128-sha1-modp1024!
-                  ikelifetime=28800s
-                  aggressive=no
-                  esp=aes128-sha256-modp2048s256,aes128-sha1-modp1024!
-                  lifetime=3600s
-                  type=tunnel
-                  dpddelay=10s
-                  dpdtimeout=30s
-                  keyexchange=ikev1
-                  rekey=yes
-                  reauth=no
-                  dpdaction=restart
-                  closeaction=restart
-                  left=%defaultroute
-                  leftsubnet=0.0.0.0/0,::/0
-                  rightsubnet=0.0.0.0/0,::/0
-                  leftupdown=/etc/strongswan/ipsec-vti.sh
-                  installpolicy=yes
-                  compress=no
-                  mobike=no
+              content: !Join
+                - ''
+                - 
+                  - !Sub |
+                    conn %default
+                      leftauth=${pAuthType}
+                      rightauth=${pAuthType}
+                      ike=aes256-sha256-modp2048s256,aes128-sha1-modp1024!
+                      ikelifetime=28800s
+                      aggressive=no
+                      esp=aes128-sha256-modp2048s256,aes128-sha1-modp1024!
+                      lifetime=3600s
+                      type=tunnel
+                      dpddelay=10s
+                      dpdtimeout=30s
+                      keyexchange=ikev1
+                      rekey=yes
+                      reauth=no
+                      dpdaction=restart
+                      closeaction=restart
+                      left=%defaultroute
+                      leftsubnet=0.0.0.0/0,::/0
+                      rightsubnet=0.0.0.0/0,::/0
+                      leftupdown=/etc/strongswan/ipsec-vti.sh
+                      installpolicy=yes
+                      compress=no
+                      mobike=no
 
-                conn AWS-VPC-TUNNEL-1
-                  left=%any
-                  right=${pTunnel1VgwOutsideIpAddress}
-                  auto=start
-                  mark=100
+                    conn AWS-VPC-TUNNEL-1
+                      left=%any
+                      right=${pTunnel1VgwOutsideIpAddress}
+                      auto=start
+                      mark=100
+                  - !If
+                    - cUseCertAuth
+                    - !Sub |2
+                        leftcert=client-public-cert.pem
+                        rightid="CN=${pTunnel1VgwCertCommonName}"
+                    - ''
+                  - !Sub |
 
-                conn AWS-VPC-TUNNEL-2
-                  left=%any
-                  right=${pTunnel2VgwOutsideIpAddress}
-                  auto=start
-                  mark=200
+                    conn AWS-VPC-TUNNEL-2
+                      left=%any
+                      right=${pTunnel2VgwOutsideIpAddress}
+                      auto=start
+                      mark=200
+                  - !If
+                    - cUseCertAuth
+                    - !Sub |2
+                        leftcert=client-public-cert.pem
+                        rightid="CN=${pTunnel2VgwCertCommonName}"
+                    - ''
+              mode: '000600'
+              owner: root
+              group: root
+            /etc/strongswan/ipsec.secrets:
+              content: !If 
+                - cUseCertAuth
+                - !Sub |
+                  : RSA client-private-cert.pem ${pClientPrivateCertPassphrase}           
+                - !Sub |
+                  ${pTunnel1VgwOutsideIpAddress} : PSK "${pTunnel1Psk}"
+                  ${pTunnel2VgwOutsideIpAddress} : PSK "${pTunnel2Psk}"
               mode: '000600'
               owner: root
               group: root
@@ -538,13 +660,6 @@ Resources:
                         ;;
                 esac
               mode: '000700'
-              owner: root
-              group: root
-            /etc/strongswan/ipsec.secrets:
-              content: !Sub |
-                ${pTunnel1VgwOutsideIpAddress} : PSK "${pTunnel1Psk}"
-                ${pTunnel2VgwOutsideIpAddress} : PSK "${pTunnel2Psk}"
-              mode: '000600'
               owner: root
               group: root
             /etc/quagga/zebra.conf:
@@ -628,6 +743,33 @@ Resources:
               mode: '000600'
               owner: root
               group: root
+        05-ConfigureVpnGatewayCertFiles:
+          files:
+            /etc/strongswan/ipsec.d/cacerts/root-ca.pem: 
+              source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pRootCaPublicCert}"
+              mode: '000600'
+              owner: root 
+              group: root
+              authentication: "S3BucketAccessCredential"
+            /etc/strongswan/ipsec.d/cacerts/subordinate-ca.pem:
+              source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pSubordinateCaPublicCert}"
+              mode: '000600' 
+              owner: root 
+              group: root
+              authentication: "S3BucketAccessCredential"
+            /etc/strongswan/ipsec.d/certs/client-public-cert.pem:
+              source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pClientPublicCert}"
+              mode: '000600'
+              owner: root 
+              group: root
+              authentication: "S3BucketAccessCredential"
+            /etc/strongswan/ipsec.d/private/client-private-cert.pem:
+              source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pClientPrivateCert}"
+              mode: '000600' 
+              owner: root 
+              group: root
+              authentication: "S3BucketAccessCredential"
+        06-ConfigureVpnGatewayCommands:
           commands:
             00-sed-instance-specific-settings:
               command: >- 
@@ -712,6 +854,21 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+
+  rPolicy:
+    Type: AWS::IAM::Policy
+    Condition: cUseCertAuth
+    Properties:
+      PolicyName: !Sub '${pOrg}-${pSystem}-${pApp}-${pEnvPurpose}-s3-read-only'
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: 
+              - s3:GetObject
+            Resource: !Sub 'arn:aws:s3:::${pCertBucket}/*'
+      Roles:
+        - !Ref rRole
 
   rInstanceProfile:
     Type: AWS::IAM::InstanceProfile

@@ -1,0 +1,98 @@
+[
+  {
+    "ParameterKey": "pOrg",
+    "ParameterValue": "example"
+  },
+  {
+    "ParameterKey": "pSystem",
+    "ParameterValue": "infra"
+  },
+  {
+    "ParameterKey": "pApp",
+    "ParameterValue": "vpngw"
+  },
+  {
+    "ParameterKey": "pEnvPurpose",
+    "ParameterValue": "test15"
+  },
+  {
+    "ParameterKey": "pAuthType",
+    "ParameterValue": "psk"
+  },
+  {
+    "ParameterKey": "pTunnel1Psk",
+    "ParameterValue": "..."
+  },
+  {
+    "ParameterKey": "pTunnel1VgwOutsideIpAddress",
+    "ParameterValue": "n.n.n.n"
+  },
+  {
+    "ParameterKey": "pTunnel1CgwInsideIpAddress",
+    "ParameterValue": "n.n.n.n/30"
+  },
+  {
+    "ParameterKey": "pTunnel1VgwInsideIpAddress",
+    "ParameterValue": "n.n.n.n/30"
+  },
+  {
+    "ParameterKey": "pTunnel1VgwBgpAsn",
+    "ParameterValue": "64512"
+  },
+  {
+    "ParameterKey": "pTunnel1BgpNeighborIpAddress",
+    "ParameterValue": "n.n.n.n"
+  },
+  {
+    "ParameterKey": "pTunnel2Psk",
+    "ParameterValue": "..."
+  },
+  {
+    "ParameterKey": "pTunnel2VgwOutsideIpAddress",
+    "ParameterValue": "n.n.n.n"
+  },
+  {
+    "ParameterKey": "pTunnel2CgwInsideIpAddress",
+    "ParameterValue": "n.n.n.n/30"
+  },
+  {
+    "ParameterKey": "pTunnel2VgwInsideIpAddress",
+    "ParameterValue": "n.n.n.n/30"
+  },
+  {
+    "ParameterKey": "pTunnel2VgwBgpAsn",
+    "ParameterValue": "64512"
+  },
+  {
+    "ParameterKey": "pTunnel2BgpNeighborIpAddress",
+    "ParameterValue": "n.n.n.n"
+  },
+  {
+    "ParameterKey": "pVpcId",
+    "ParameterValue": "vpc-0..."
+  },
+  {
+    "ParameterKey": "pVpcCidr",
+    "ParameterValue": "10.0.0.0/16"
+  },
+  {
+    "ParameterKey": "pSubnetId",
+    "ParameterValue": "subnet-0..."
+  },
+  {
+    "ParameterKey": "pUseElasticIp",
+    "ParameterValue": "true"
+  },
+  {
+    "ParameterKey": "pEipAllocationId",
+    "ParameterValue": "eipalloc-0..."
+  },
+  {
+    "ParameterKey": "pLocalBgpAsn",
+    "ParameterValue": "65000"
+  },
+  {
+    "ParameterKey": "pInstanceType",
+    "ParameterValue": "t3a.micro"
+  }
+]

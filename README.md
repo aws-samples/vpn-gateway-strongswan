@@ -65,7 +65,33 @@ The example AWS CloudFormation template automatically builds a stack that demons
 
 The following instructions are primarily oriented toward the first use case and two deployment topologies described above: Site-to-Site VPN with AWS Transit Gateway and Site-to-Site VPN with Virtual Private Gateway.  If you're interested in demonstrating a DIY solution for both ends of a site-to-site VPN connection, you should be able to easily extend these instructions.
 
-### 1. Determine Deployment Location: Public or Private Subnet
+### 1. Determine authentication approach
+
+This template supports pre-shared key- and certificate-based authentication.  
+
+#### Pre-Shared Key-Based Authentication
+
+You'll obtain the the pre-shared keys for the two tunnels after you've configured the site-to-site VPN connection.
+
+#### Certificate-Based Authentication
+
+In support of certificate based authentication, you will need to supply the following certificates:
+
+* Client certificate .pem file
+* Client private key .pem file
+* Root CA certificate .pem file
+* Subordinate CA certificate .pem file
+
+The certificates need to be present in an S3 bucket that is accessible from the AWS account in which you're deploying the VPN gateway stack.
+
+You'll also need to supply:
+
+* Passphrase for the client private key file
+* Common name (CN) from the certificate for each of the two VPN tunnels associated with the remote virtual gateway
+
+See [How do I create a certificate-based VPN using AWS Site-to-Site VPN?](https://aws.amazon.com/premiumsupport/knowledge-center/vpn-certificate-based-site-to-site/) for more details.
+
+### 2. Determine Deployment Location: Public or Private Subnet
 
 Since VPN connections typically occur over the public Internet, you'll need to have at least one public IP address to represent the local side of the VPN tunnels.  You have several options to associate a public IP address. In either case, decoupling the creation and management of the public IP address from the creation and management of the VPN gateway enables you to replace the VPN gateway stack including the associated strongSwan EC2 instance without needing to reconfigure the remote end of the site-to-site VPN connection.
 
@@ -77,15 +103,19 @@ Before deploying this stack, create an Elastic IP (EIP) address and obtain its a
 
 In this case, you discover the public IP address of the NAT Gateway and use it when configuring the remote side of the VPN connection.  When deploying this stack, you accept the default `false` setting for the `pUseElasticIp` parameter. Since the local side of the site-to-site VPN initiates the connection, the local strongSwan VPN gateway will initiate the connection through the NAT Gateways public IP address.
 
-### 2. Determine VPN Tunnel Configuration Settings
+### 3. Determine VPN Tunnel Configuration Settings
 
 When using either AWS VGWs or TGWs for the remote end of the site-to-site VPN connection, a site-to-site VPN connection resource will be established in AWS on the remote site. Within the site-to-site VPN connection resource on the remote site, you can download a VPN configuration file that will provide you with much of the data required to deploy the local VPN gateway. In the AWS management console, see `VPC -> Site-to-Site VPN Connections`, select the connection of interest, click `Download` and select the `Generic` option for `Vendor` and download the configuration file.
 
 Review the data in this file in preparation for passing it as parameters to the CloudFormation stack in the next step.
 
-### 3. Deploy VPN Gateway Stack
+### 4. Deploy VPN Gateway Stack
 
 In this step you'll create a CloudFormation stack using the [`vpn-gateway-strongswan.yml`](https://raw.githubusercontent.com/aws-samples/vpn-gateway-strongwswan/master/vpn-gateway-strongswan.yml) template and configuration data obtained from the remote site's Site-to-Site VPN Connection resource.
+
+You can either use the AWS management console or an included helper script and the AWS CLI to create the stack.  Given the number of parameters, you might find it easier to use the CLI so that you can specify the parameter values once in a JSON file as opposed to entering them via the AWS management console.
+
+#### Use AWS Management Console
 
 * Use the CloudFormation template to deploy a VPN gateway stack in an appropriate subnet based on the [Parameters](#parameters) described below.
   * Use the [AWS Management Console](https://console.aws.amazon.com/cloudformation/home) to access the CloudFormation service.
@@ -100,6 +130,23 @@ In this step you'll create a CloudFormation stack using the [`vpn-gateway-strong
   * Click "Next" to "Configure stack options".
   * Click "Next" to review your stack settings.
   * Click "Create stack".
+
+#### Use AWS CLI
+
+If you have the AWS CLI installed, you might find it easier to use included shell script `manage-stack` to easily create the stack.
+
+1. Clone this repository to your local system on which you have the AWS CLI installed.
+2. Customize one of the `template-parameters-*.json` files containing example sets of parameters for your stack. Choose the file based on whether you're using PSK- or certificate-based authentication.
+3. Execute the `manage-stack` wrapper script to create the stack. See the script for the supported options.
+
+```
+$ ./manage-stack -e mystack1 template-parameters-certificate-auth.json
+```
+
+You can monitor stack creation progress via the AWS management console.
+
+#### After Starting the Create Stack Process
+
 * Wait for creation of the stack to complete. Since the template uses a wait condition, the stack won't complete until strongSwan and other components have been configured and started.
 * Wait for several minutes after stack creation completes. Then monitor the Site-to-Site VPN Connection on the remote site to confirm that the two VPN tunnels have progressed from the `DOWN` state to the `UP` state.  If the VPN gateway configuration is correct, Tunnel 1 will come up first followed several minutes later by Tunnel 2.
 
@@ -134,21 +181,31 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |`pSystem`|Optional|As an example of using resurce naming standards, include a system identifier in the names of resources including, for example, IAM roles..|`infra`|
 |`pApp`|Optional|As an example of using resurce naming standards, include an application identifier in the names of resources including, for example, IAM roles.|`vpngw`|
 |`pEnvPurpose`|Required|As an example of using resurce naming standards, include a purpose for this particulart instance of the stack in the names of resources including, for example, IAM roles.. For example, "dev1", "test", "1", etc.|None|
+|**Authentication**| | | |
+|`pAuthType`|Optional|The type of authentication. Either `psk` or `pubkey`. Use `pubkey` for certificate-based authentication.|`psk`|
+|`pCertBucket`|Optional|Name of S3 bucket containing the following certificate files in `.pem` format. Required when using certification-based authentication.|None|
+|`pClientPublicCert`|Optional|Name of client public certificate file residing in S3. Required when using certification-based authentication.|None|
+|`pClientPrivateCert`|Optional|Name of client private certificate file residing in S3. Required when using certification-based authentication.|None|
+|`pClientPrivateCertPassphrase`|Optional|Passphrase for client private certificate file residing in S3. Required when using certification-based authentication.|None|
+|`pRootCaPublicCert`|Optional|Name of root CA certificate file residing in S3. Required when using certification-based authentication.|None|
+|`pSubordinateCaPublicCert`|Optional|Name of subordinate CA certificate file residing in S3. Required when using certification-based authentication.|None|
 |**VPN Tunnel 1**| | | |
-|`pTunnel1Psk`|Required|See the remote site's configuration for the "IPSec Tunnel #1" section and "Pre-Shared Key" value.|None|
+|`pTunnel1Psk`|Optional|See the remote site's configuration for the "IPSec Tunnel #1" section and "Pre-Shared Key" value. Required when using PSK-based authentication.|None|
+|`pTunnel1VgwCertCommonName`|Optional|Common name (CN) of certificate associated with tunenl 1. Required when using certificate-based authentication.|None|
 |`pTunnel1VgwOutsideIpAddress`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Outside IP Addresses" section and "Virtual Private Gateway" value.|None|
 |`pTunnel1CgwInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Inside IP Addresses" section and "Customer Gateway" value.|None|
 |`pTunnel1VgwInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Inside IP Addresses" section and "Virtual Private Gateway" value.|None|
 |`pTunnel1VgwBgpAsn`|Optional|See the remote site's configuration for the "BGP Configuration Options" and the "Virtual Private  Gateway ASN" value.|`64512`|
 |`pTunnel1BgpNeighborIpAddress`|Required|See the remote site's configuration for the "BGP Configuration Options" and the "Neighbor IP Address" value.|None|
 |**VPN Tunnel 2**| | | |
-|`pTunnel2Psk`|Required|See Tunnel 1.|None|
+|`pTunnel2Psk`|Optional|See the remote site's configuration for the "IPSec Tunnel #2" section and "Pre-Shared Key" value. Required when using PSK-based authentication.|None|
+|`pTunnel2VgwCertCommonName`|Optional|Common name (CN) of certificate associated with tunenl 2. Required when using certificate-based authentication.|None|
 |`pTunnel2VgwOutsideIpAddress`|Required|See Tunnel 1.|None|
 |`pTunnel2CgwInsideCidr`|Required|See Tunnel 1.|None|
 |`pTunnel2VgwInsideCidr`|Required|See Tunnel 1.|None|
 |`pTunnel2VgwBgpAsn`|Optional|See Tunnel 1.|`64512`|
 |`pTunnel2BgpNeighborIpAddress`|Required|See Tunnel 1.|None|
-|**Local Network**| | | |
+|**Local Network Configuration**| | | |
 |`pVpcId`|Required|The VPC in which the VPN gateway is to be deployed.|None|
 |`pVpcCidr`|Required|The CIDR block of the local VPC. Used to advertise via BGP routing information to the remote site.|None|
 |`pSubnetId`|Required|The subnet in which the VPN gateway is to be deployed.|None|
@@ -163,7 +220,7 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 
 ### VPN Gateway Stack Fails On Creation
 
-Double check your parameter settings against both your local network configuration and the configuration of the site-to-site tunnels.  If you're using an Elastic IP address, ensure that the allocation ID is correct.
+Verify your parameter settings against both your local network configuration and the configuration of the site-to-site tunnels.  If you're using an Elastic IP address, ensure that the allocation ID is correct.
 
 ### Tunnels Don't Come Up
 
