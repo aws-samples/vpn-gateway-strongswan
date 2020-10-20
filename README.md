@@ -87,8 +87,8 @@ The certificates need to be present in an S3 bucket that is accessible from the 
 
 You'll also need to supply:
 
-* Passphrase for the client private key file
-* Common name (CN) from the certificate for each of the two VPN tunnels associated with the remote virtual gateway
+* Name of a secret in AWS Secrets Manager that contains the passphrase for the client private key file. The secret must have a `key:value` pair with a `key` = `passphrase` and a value that matches the passphrase used to protect the client private key file.
+* Common name (CN) from the certificate for each of the two VPN tunnels associated with the remote virtual gateway.
 
 See [How do I create a certificate-based VPN using AWS Site-to-Site VPN?](https://aws.amazon.com/premiumsupport/knowledge-center/vpn-certificate-based-site-to-site/) for more details.
 
