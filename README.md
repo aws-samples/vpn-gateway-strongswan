@@ -186,12 +186,12 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |`pEnvPurpose`|Required|As an example of using resurce naming standards, include a purpose for this particulart instance of the stack in the names of resources including, for example, IAM roles.. For example, "dev1", "test", "1", etc.|None|
 |**Authentication**| | | |
 |`pAuthType`|Optional|The type of authentication. Either `psk` or `pubkey`. Use `pubkey` for certificate-based authentication.|`psk`|
-|`pCertBucket`|Optional|Name of S3 bucket containing the following certificate files in `.pem` format. Required when using certification-based authentication.|None|
-|`pClientPublicCert`|Optional|Name of client public certificate file residing in S3. Required when using certification-based authentication.|None|
-|`pClientPrivateCert`|Optional|Name of client private certificate file residing in S3. Required when using certification-based authentication.|None|
-|`pClientPrivateCertPassphrase`|Optional|Passphrase for client private certificate file residing in S3. Required when using certification-based authentication.|None|
-|`pRootCaPublicCert`|Optional|Name of root CA certificate file residing in S3. Required when using certification-based authentication.|None|
-|`pSubordinateCaPublicCert`|Optional|Name of subordinate CA certificate file residing in S3. Required when using certification-based authentication.|None|
+|`pCertBucket`|Optional|Name of S3 bucket containing the following certificate files in `.pem` format. Required when using certificate-based authentication.|None|
+|`pClientPublicCert`|Optional|Name of client public certificate file residing in S3. Required when using certificate-based authentication.|None|
+|`pClientPrivateCert`|Optional|Name of client private certificate file residing in S3. Required when using certificate-based authentication.|None|
+|`pClientPrivateCertPassphraseSecretName`|Optional|Name of secret in AWS Secrets Manager containing the passphrase for the client private certificate file residing in S3. Required when using certificate-based authentication.<br><br>AWS Secrets Manager secret must be in the form of `passphrase:<value>` where `passphrase` is the key and `<value>` is the passphrase value.|None|
+|`pRootCaPublicCert`|Optional|Name of root CA certificate file residing in S3. Required when using certificate-based authentication.|None|
+|`pSubordinateCaPublicCert`|Optional|Name of subordinate CA certificate file residing in S3. Required when using certificate-based authentication.|None|
 |**VPN Tunnel 1**| | | |
 |`pTunnel1Psk`|Optional|See the remote site's configuration for the "IPSec Tunnel #1" section and "Pre-Shared Key" value. Required when using PSK-based authentication.|None|
 |`pTunnel1VgwCertCommonName`|Optional|Common name (CN) of certificate associated with tunenl 1. Required when using certificate-based authentication.|None|

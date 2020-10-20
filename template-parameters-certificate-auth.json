@@ -32,7 +32,7 @@
     "ParameterValue": "example-cloud-vpn-private-key.pem"
   },
   {
-    "ParameterKey": "pClientPrivateCertPassphrase",
+    "ParameterKey": "pClientPrivateCertPassphraseSecretName",
     "ParameterValue": "..."
   },
   {

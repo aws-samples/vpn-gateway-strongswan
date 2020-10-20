@@ -24,7 +24,7 @@ Metadata:
       - pCertBucket
       - pClientPublicCert
       - pClientPrivateCert
-      - pClientPrivateCertPassphrase
+      - pClientPrivateCertPassphraseSecretName
       - pRootCaPublicCert
       - pSubordinateCaPublicCert
     - Label:
@@ -80,8 +80,8 @@ Metadata:
         default: Client Public Certificate (S3 key)
       pClientPrivateCert:
         default: Client Private Certificate (S3 key)
-      pClientPrivateCertPassphrase:
-        default: Client Private Certificate Passphrase
+      pClientPrivateCertPassphraseSecretName:
+        default: Name of secret in AWS Secrets Manager for Client Private Certificate Passphrase
       pRootCaPublicCert:
         default: Root CA Public Certificate (S3 key)
       pSubordinateCaPublicCert:
@@ -180,17 +180,8 @@ Parameters:
     Type: String
     Default: ''
 
-# To Do: Implement a more secure approach to obtaining the following passphrase.
-# The solution to be implemented:
-#  1. Add the passphrase as a secret in AWS Secrets Manager
-#  2. Pass the name of the secret in place of the following parameter
-#  3. Use one of the cfn-init scripts to  obtain the secret via the AWS CLI
-#  4. Update the associated configuration file. 
-#
-# The IAM role will need to be enhanced to add a permission to allow for the retrieval of the secret.
-
-  pClientPrivateCertPassphrase:
-    Description: Client Private Certificate Passphrase. Required for certificate-based authentication.
+  pClientPrivateCertPassphraseSecretName:
+    Description: Name of secret in AWS Secrets Manager for Client Private Certificate Passphrase. Required for certificate-based authentication.
     Type: String
     Default: ''
 
@@ -520,6 +511,7 @@ Resources:
               strongswan: []
               ntp: []
               quagga: []
+              jq: []
           files:
             /etc/strongswan/strongswan.conf:
               content: |
@@ -604,8 +596,8 @@ Resources:
             /etc/strongswan/ipsec.secrets:
               content: !If 
                 - cUseCertAuth
-                - !Sub |
-                  : RSA client-private-cert.pem ${pClientPrivateCertPassphrase}           
+                - |
+                  : RSA client-private-cert.pem {PASSPHRASE}          
                 - !Sub |
                   ${pTunnel1VgwOutsideIpAddress} : PSK "${pTunnel1Psk}"
                   ${pTunnel2VgwOutsideIpAddress} : PSK "${pTunnel2Psk}"
@@ -778,6 +770,27 @@ Resources:
               owner: root 
               group: root
               authentication: "S3BucketAccessCredential"
+            /tmp/set-passphrase.sh:
+              content: !Sub |
+                #!/bin/bash
+                
+                PASSPHRASE=$(aws secretsmanager get-secret-value --secret-id ${pClientPrivateCertPassphraseSecretName} --region ${AWS::Region} | jq -r '.SecretString' | jq -r '.passphrase') &&
+                
+                if test -z "$PASSPHRASE"
+                then
+                  echo "\$PASSPHRASE is empty"
+                  exit 1
+                else
+                  echo "\$PASSPHRASE is NOT empty"
+                  sed -i -e "s/{PASSPHRASE}/${!PASSPHRASE}/" /etc/strongswan/ipsec.secrets
+                fi
+              mode: '000700'
+              owner: root
+              group: root
+          commands:
+            00-set-private-key-passphrase:
+              command: >- 
+                /tmp/set-passphrase.sh
         06-ConfigureVpnGatewayCommands:
           commands:
             00-sed-instance-specific-settings:
@@ -864,7 +877,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
 
-  rPolicy:
+  rPolicyS3:
     Type: AWS::IAM::Policy
     Condition: cUseCertAuth
     Properties:
@@ -876,6 +889,22 @@ Resources:
             Action: 
               - s3:GetObject
             Resource: !Sub 'arn:aws:s3:::${pCertBucket}/*'
+      Roles:
+        - !Ref rRole
+
+  rPolicySecretsManager:
+    Type: AWS::IAM::Policy
+    Condition: cUseCertAuth
+    Properties:
+      PolicyName: !Sub '${pOrg}-${pSystem}-${pApp}-${pEnvPurpose}-secrets-manager-read-only'
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - secretsmanager:GetSecretValue
+              - secretsmanager:DescribeSecret
+            Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${pClientPrivateCertPassphraseSecretName}-*'
       Roles:
         - !Ref rRole
 
