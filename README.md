@@ -7,7 +7,7 @@ Even if you don’t have a need to demonstrate integration with AWS site-to-site
 * [Use Cases and Topologies](#use-cases-and-topologies)
 * [Integration with AWS Services](#cloudformation-features-demonstrated)
 * [Usage](#usage)
-* [Parameters](#parameters)
+* [CloudFormation Template Parameters](#cloudformation-template-parameters)
 * [Troubleshooting](#troubleshooting)
 * [Inspecting the strongSwan VPN Gateway EC2 Instance](#inspecting-the-strongswan-vpn-gateway-ec2-instance)
 * [Advanced Usage](#advanced-usage)
@@ -118,7 +118,7 @@ You can either use the AWS management console or an included helper script and t
 
 #### Use AWS Management Console
 
-Use the CloudFormation template to deploy a VPN gateway stack in an appropriate subnet based on the [Parameters](#parameters) described below.
+Use the CloudFormation template to deploy a VPN gateway stack in an appropriate subnet based on the [CloudFormation Template Parameters](#cloudformation-template-parameters) described below.
 
 1. Use the [AWS Management Console](https://console.aws.amazon.com/cloudformation/home) to access the CloudFormation service.
 1. Ensure that the desired AWS region is selected.
@@ -129,7 +129,7 @@ Use the CloudFormation template to deploy a VPN gateway stack in an appropriate 
 1. Select "Choose file" to select the CloudFormation template file that you downloaded.
 1. Select "Next" to "Specify stack details".
 1. Enter a name for your new CloudFormation stack. For example, "vpn-gateway".
-1. Override and/or fill in the required parameters.  See [Parameters](#parameters) for details.
+1. Override and/or fill in the required parameters.  See [CloudFormation Template Parameters](#cloudformation-template-parameters) for details.
 1. Select "Next" to "Configure stack options".
 1. Select "Next" to review your stack settings.
 1. Select "Create stack".
@@ -185,7 +185,7 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 * Use `ping` on one of the two ends to validate routing and connectivity between the instances.
 * Use `# tcpdump -eni any icmp` to on the target instance to monitor traffic.
 
-## Parameters
+## CloudFormation Template Parameters
 
 |Parameter|Required|Description|Default|
 |---------|--------|-----------|-------|
