@@ -231,9 +231,21 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 
 ## Troubleshooting
 
-### VPN Gateway Stack Fails On Creation
+### Stack creation fails quickly
 
 Verify your parameter settings against both your local network configuration and the configuration of the site-to-site tunnels.  If you're using an Elastic IP address, ensure that the allocation ID is correct.
+
+### Stack creation fails afer a long period of time
+
+You may find that the stack creation fails after multiple minutes and resources are rolled back.  In this case, it's best to delete the stack and use the CLI approach described above in an attempt to create the stack again.  However, this time, you'll use CloudWatch logs to inspect the progress of the first boot configuration steps during stack creation.
+
+Similar to the previous circumstance, verify your parameter settings against both your local network configuration and the configuration of the site-to-site tunnels.  If you're using an Elastic IP address, ensure that the allocation ID is correct.
+
+If no obvious issues are identified based on a review of the template parameters, delete the failed stack and use the CLI approach in an attempt to create the stack again.  This time, during stack creation, inspect the CloudWatch logs group to gain insight into failures that might be occuring during the first boot configuration process. For example, if the S3 bucket name for certificate key files is incorrect, the first boot configuration process may fail.
+
+Specifically, access the `cfn-init.log` log stream to review the first boot configuration for any errors. By default, the log group for you EC2 instance will be named `/infra/vpngw/ec2/<environment purpose>`.
+
+If the `cfn-init.log` log stream looks clean, then review the `charon.log` log stream for errors. If you're using certificate-based authentication and your certificates and key files are incorrect, then you'll typically see errors in this log stream.
 
 ### Tunnels Don't Come Up
 
