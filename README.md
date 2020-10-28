@@ -140,10 +140,10 @@ If you have the AWS CLI installed, you might find it easier to use the included 
 
 1. Clone this repository to your local system on which you have the AWS CLI installed.
 2. Customize one of the `template-parameters-*.json` files containing example sets of parameters for your stack.
-3. Execute the `manage-stack` wrapper script to create the stack. See the script for the supported options.
+3. Execute the `manage-stack` wrapper script to create the stack. See the script for the supported options. For example, the script currently defaults to `us-east-2`. If you need to use a different region, specify the `--region` option argument.
 
 ```
-$ ./manage-stack -e mystack1 template-parameters-certificate-auth.json
+$ ./manage-stack -e mystack1 --region us-east-1 template-parameters-certificate-auth.json
 ```
 
 Monitor the progress of stack creation via the AWS management console.
