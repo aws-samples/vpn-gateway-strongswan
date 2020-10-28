@@ -53,14 +53,18 @@ else
 fi
 
 if [ -z ${ENV_PURPOSE_ARG+x} ]; then
-  echo 'Must supply --env-purpose|-e argument with qualifier of the environment purpose'
-  exit 1
+  ENV_PURPOSE=
 else
   ENV_PURPOSE=$ENV_PURPOSE_ARG
 fi
 
 if [ -z ${STACK_NAME_ARG+x} ]; then
-  STACK_NAME=vpn-gateway-${ENV_PURPOSE}
+  if [ -z ${ENV_PURPOSE_ARG+x} ]; then
+    echo 'Must supply either --env-purpose|-e or -s|--stack-name'
+    exit 1
+  else
+    STACK_NAME=vpn-gateway-${ENV_PURPOSE}
+  fi
 else
   STACK_NAME=$STACK_NAME_ARG
 fi
@@ -78,9 +82,9 @@ else
 fi
 
 if [ -z ${REGION_ARG+x} ]; then
-  REGION=us-east-2
+  REGION=
 else
-  REGION=$PROFILE_ARG
+  REGION="--region $REGION_ARG"
 fi
 
 aws cloudformation ${CMD} \
@@ -88,7 +92,7 @@ aws cloudformation ${CMD} \
                      --template-body file://./${TEMPLATE} \
                      --parameters file://${1} \
                      --capabilities CAPABILITY_NAMED_IAM \
-                     --region ${REGION} \
+                     ${REGION} \
                      ${PROFILE}
 
 #aws cloudformation wait stack-create-complete --stack-name ${STACK_NAME} --region ${AWS_REGION} --profile ${AWS_PROFILE}

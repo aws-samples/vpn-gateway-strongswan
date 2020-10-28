@@ -140,11 +140,21 @@ If you have the AWS CLI installed, you might find it easier to use the included 
 
 1. Clone this repository to your local system on which you have the AWS CLI installed.
 2. Customize one of the `template-parameters-*.json` files containing example sets of parameters for your stack.
-3. Execute the `manage-stack` wrapper script to create the stack. See the script for the supported options. For example, the script currently defaults to `us-east-2`. If you need to use a different region, specify the `--region` option argument.
+3. Execute the `manage-stack` wrapper script to create the stack. 
+
+|Option|Required?|Description|Default|
+|---------|--------|-----------|-------|
+|`-e|--env-purpose`|Conditional. Required when `-s|--stack-name` is not specified.|Use to qualify the stack name of the form `vpn-gateway-<env-purpose>`. For example, `-e mytest` results in a stack name of `vpn-gateway-mytest`.|None|
+|`-s|--stack-name`|Conditional. Required when `-e|--env-purpose` is not specified.|Specifies the name to assign to the newly created stack.|None|
+|`-r|--region`|Optional|AWS region. Since the `aws` CLI is used, the standard environment variables are honored.|The `aws` CLI will use the standard `AWS_DEFAULT_REGION` environment variable if set.|
+|`-p|--profile`|Optional|AWS profile. Since the `aws` CLI is used, the standard environment variables are honored.|The `aws` CLI will use the standard `AWS_PROFILE` environment variable if set.|
+
+An example execution:
 
 ```
 $ ./manage-stack -e mystack1 --region us-east-1 template-parameters-certificate-auth.json
 ```
+Execution of this command would result in an attempt to create a new stack of the name `vpn-gateway-mystack1`.
 
 Monitor the progress of stack creation via the AWS management console.
 
