@@ -116,7 +116,7 @@ Review the data in this file in preparation for passing it as parameters to the 
 
 In this step you'll create a CloudFormation stack using the [`vpn-gateway-strongswan.yml`](https://raw.githubusercontent.com/aws-samples/vpn-gateway-strongwswan/master/vpn-gateway-strongswan.yml) template and configuration data obtained from the remote site's Site-to-Site VPN Connection resource.
 
-You can either use the AWS management console or an included helper script and the AWS CLI to create the stack.  Given the number of parameters, you might find it easier to use the CLI so that you can specify the parameter values once in a JSON file as opposed to entering them via the AWS management console.
+You can use either the AWS management console or an included helper script and the AWS CLI to create the stack.  Given the number of parameters involved, you will probably find it easier to use the CLI so that you can specify the parameter values once in a JSON file as opposed to entering them via the AWS management console. using the CLI approach also makes it easier to spin up new stack instances both in cases where failures occur and you want to change settings to experiment with features.
 
 #### Use AWS Management Console
 
