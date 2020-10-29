@@ -58,6 +58,8 @@ The example AWS CloudFormation template automatically builds a stack that demons
 
 * [AWS Systems Manager Session Manager](https://docs.aws.amazon.com/en_pv/systems-manager/latest/userguide/session-manager.html) to enable secure terminal access to the OS instance without the need to establish Internet accessible bastion hosts and port 22 access to the VPN gateway.
 
+* [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/) to support secure storage and retrieval of the private key passphrase when certificate-based authentication is used for your site-to-site VPN connection.
+
 * [Systems Manager Parameter Store](https://aws.amazon.com/blogs/compute/query-for-the-latest-amazon-linux-ami-ids-using-aws-systems-manager-parameter-store/) to query for latest Amazon Linux 2 Amazon Machine Image (AMI) images.
 
 * Standardized naming of cloud resources to help distinguish from other resources, identify ownership, and potentially aid in access control.
