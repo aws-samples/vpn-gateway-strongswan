@@ -28,11 +28,11 @@
     "ParameterValue": "example-cloud-vpn-cert.pem"
   },
   {
-    "ParameterKey": "pClientPrivateCert",
+    "ParameterKey": "pClientPrivateKey",
     "ParameterValue": "example-cloud-vpn-private-key.pem"
   },
   {
-    "ParameterKey": "pClientPrivateCertPassphraseSecretName",
+    "ParameterKey": "pClientPrivateKeyPassphraseSecretName",
     "ParameterValue": "..."
   },
   {
@@ -44,7 +44,7 @@
     "ParameterValue": "example-cloud-subordinate-ca.pem"
   },
   {
-    "ParameterKey": "pTunnel1VgwCertCommonName",
+    "ParameterKey": "pTunnel1VgwCertDomainName",
     "ParameterValue": "vpn-0nnn.endpoint-0"
   },
   {
@@ -68,7 +68,7 @@
     "ParameterValue": "n.n.n.n"
   },
   {
-    "ParameterKey": "pTunnel2VgwCertCommonName",
+    "ParameterKey": "pTunnel2VgwCertDomainName",
     "ParameterValue": "vpn-0nnn.endpoint-1"
   },
   {

@@ -23,15 +23,15 @@ Metadata:
       - pAuthType
       - pCertBucket
       - pClientPublicCert
-      - pClientPrivateCert
-      - pClientPrivateCertPassphraseSecretName
+      - pClientPrivateKey
+      - pClientPrivateKeyPassphraseSecretName
       - pRootCaPublicCert
       - pSubordinateCaPublicCert
     - Label:
         default: VPN Tunnel 1
       Parameters:
       - pTunnel1Psk
-      - pTunnel1VgwCertCommonName
+      - pTunnel1VgwCertDomainName
       - pTunnel1VgwOutsideIpAddress
       - pTunnel1CgwInsideIpAddress
       - pTunnel1VgwInsideIpAddress
@@ -41,7 +41,7 @@ Metadata:
         default: VPN Tunnel 2
       Parameters:
       - pTunnel2Psk
-      - pTunnel2VgwCertCommonName
+      - pTunnel2VgwCertDomainName
       - pTunnel2VgwOutsideIpAddress
       - pTunnel2CgwInsideIpAddress
       - pTunnel2VgwInsideIpAddress
@@ -75,13 +75,13 @@ Metadata:
       pAuthType:
         default: "Authentication type: 'psk' - Pre-shared key or 'pubkey' - Certificate"
       pCertBucket:
-        default: S3 Bucket Containing Certificates
+        default: S3 Bucket Containing Certificates and Client Private Key
       pClientPublicCert:
         default: Client Public Certificate (S3 key)
-      pClientPrivateCert:
-        default: Client Private Certificate (S3 key)
-      pClientPrivateCertPassphraseSecretName:
-        default: Name of secret in AWS Secrets Manager for Client Private Certificate Passphrase
+      pClientPrivateKey:
+        default: Client Private Key (S3 key)
+      pClientPrivateKeyPassphraseSecretName:
+        default: Name of secret in AWS Secrets Manager for Client Private Key Passphrase
       pRootCaPublicCert:
         default: Root CA Public Certificate (S3 key)
       pSubordinateCaPublicCert:
@@ -89,8 +89,8 @@ Metadata:
 
       pTunnel1Psk:
         default: VPN Tunnel 1 Pre-Shared Key
-      pTunnel1VgwCertCommonName:
-        default: VPN Tunnel 1 Virtual Private Gateway Common Name (CN) - Certificate Authentication. e.g vpn-07..78.endpoint-0
+      pTunnel1VgwCertDomainName:
+        default: VPN Tunnel 1 Virtual Private Gateway Domain Name - Certificate Authentication. e.g vpn-07..78.endpoint-0
       pTunnel1VgwOutsideIpAddress:
         default: VPN Tunnel 1 Virtual Private Gateway Outside IP Address
       pTunnel1CgwInsideIpAddress:
@@ -104,8 +104,8 @@ Metadata:
 
       pTunnel2Psk:
         default: VPN Tunnel 2 Pre-Shared Key
-      pTunnel2VgwCertCommonName:
-        default: VPN Tunnel 2 Virtual Private Gateway Common Name (CN) - Certificate Authentication. e.g vpn-07..78.endpoint-1
+      pTunnel2VgwCertDomainName:
+        default: VPN Tunnel 2 Virtual Private Gateway Domain Name - Certificate Authentication. e.g vpn-07..78.endpoint-1
       pTunnel2VgwOutsideIpAddress:
         default: VPN Tunnel 2 Virtual Private Gateway Outside IP Address
       pTunnel2CgwInsideIpAddress:
@@ -166,7 +166,7 @@ Parameters:
       - pubkey
 
   pCertBucket:
-    Description: S3 Bucket Containing Certificates. Required for certificate-based authentication.
+    Description: S3 Bucket Containing Certificates and Client Private Key. Required for certificate-based authentication.
     Type: String
     Default: ''
 
@@ -175,13 +175,13 @@ Parameters:
     Type: String
     Default: ''
   
-  pClientPrivateCert:
-    Description: Client Private Certificate (S3 key). Required for certificate-based authentication.
+  pClientPrivateKey:
+    Description: Client Private Key (S3 key). Required for certificate-based authentication.
     Type: String
     Default: ''
 
-  pClientPrivateCertPassphraseSecretName:
-    Description: Name of secret in AWS Secrets Manager for Client Private Certificate Passphrase. Required for certificate-based authentication.
+  pClientPrivateKeyPassphraseSecretName:
+    Description: Name of secret in AWS Secrets Manager for Client Private Key Passphrase. Required for certificate-based authentication.
     Type: String
     Default: ''
 
@@ -200,8 +200,8 @@ Parameters:
     Type: String
     Default: ''
 
-  pTunnel1VgwCertCommonName:
-    Description: VPN Tunnel 1 Virtual Private Gateway Common Name (CN). Required for certificate-based authentication. e.g vpn-07..78.endpoint-1
+  pTunnel1VgwCertDomainName:
+    Description: VPN Tunnel 1 Virtual Private Gateway Domain Name. Required for certificate-based authentication. e.g vpn-07..78.endpoint-1
     Type: String
     Default: ''
 
@@ -233,8 +233,8 @@ Parameters:
     Type: String
     Default: ''
 
-  pTunnel2VgwCertCommonName:
-    Description: VPN Tunnel 2 Virtual Private Gateway Common Name (CN). Required for certificate-based authentication. e.g vpn-07..78.endpoint-1
+  pTunnel2VgwCertDomainName:
+    Description: VPN Tunnel 2 Virtual Private Gateway Domain Name. Required for certificate-based authentication. e.g vpn-07..78.endpoint-1
     Type: String
     Default: ''
 
@@ -575,7 +575,7 @@ Resources:
                     - cUseCertAuth
                     - !Sub |2
                         leftcert=client-public-cert.pem
-                        rightid="CN=${pTunnel1VgwCertCommonName}"
+                        rightid="CN=${pTunnel1VgwCertDomainName}"
                     - ''
                   - !Sub |
 
@@ -588,7 +588,7 @@ Resources:
                     - cUseCertAuth
                     - !Sub |2
                         leftcert=client-public-cert.pem
-                        rightid="CN=${pTunnel2VgwCertCommonName}"
+                        rightid="CN=${pTunnel2VgwCertDomainName}"
                     - ''
               mode: '000600'
               owner: root
@@ -765,7 +765,7 @@ Resources:
               group: root
               authentication: "S3BucketAccessCredential"
             /etc/strongswan/ipsec.d/private/client-private-key.pem:
-              source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pClientPrivateCert}"
+              source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pClientPrivateKey}"
               mode: '000600' 
               owner: root 
               group: root
@@ -774,7 +774,7 @@ Resources:
               content: !Sub |
                 #!/bin/bash
                 
-                PASSPHRASE=$(aws secretsmanager get-secret-value --secret-id ${pClientPrivateCertPassphraseSecretName} --region ${AWS::Region} | jq -r '.SecretString' | jq -r '.passphrase') &&
+                PASSPHRASE=$(aws secretsmanager get-secret-value --secret-id ${pClientPrivateKeyPassphraseSecretName} --region ${AWS::Region} | jq -r '.SecretString' | jq -r '.passphrase') &&
                 
                 if test -z "$PASSPHRASE"
                 then
@@ -904,7 +904,7 @@ Resources:
             Action:
               - secretsmanager:GetSecretValue
               - secretsmanager:DescribeSecret
-            Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${pClientPrivateCertPassphraseSecretName}-*'
+            Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${pClientPrivateKeyPassphraseSecretName}-*'
       Roles:
         - !Ref rRole
 

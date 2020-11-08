@@ -206,15 +206,15 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |`pSubordinateCaPublicCert`|Optional|Name of subordinate CA certificate file residing in S3. Required when using certificate-based authentication.|None|
 |**VPN Tunnel 1**| | | |
 |`pTunnel1Psk`|Optional|See the remote site's configuration for the "IPSec Tunnel #1" section and "Pre-Shared Key" value. Required when using PSK-based authentication.|None|
-|`pTunnel1VgwCertCommonName`|Optional|Common name (CN) of certificate associated with tunenl 1. Required when using certificate-based authentication.|None|
-|`pTunnel1VgwOutsideIpAddress`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Outside IP Addresses" section and "Virtual Private Gateway" value.|None|
-|`pTunnel1CgwInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Inside IP Addresses" section and "Customer Gateway" value.|None|
-|`pTunnel1VgwInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" secton, "Inside IP Addresses" section and "Virtual Private Gateway" value.|None|
+|`pTunnel1VgwCertDomainName`|Optional|The domain name of the certificate associated with tunnel 1. Required when using certificate-based authentication.<br><br>You can obtain this value from accessing your site-to-site VPN connection in your AWS environment, selecting the "Tunnel Details" tab, and selecting the "Certificate ARN".|None|
+|`pTunnel1VgwOutsideIpAddress`|Required|See the remote site's configuration for the "IPSec Tunnel #1" section, "Outside IP Addresses" section and "Virtual Private Gateway" value.|None|
+|`pTunnel1CgwInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" section, "Inside IP Addresses" section and "Customer Gateway" value.|None|
+|`pTunnel1VgwInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" section, "Inside IP Addresses" section and "Virtual Private Gateway" value.|None|
 |`pTunnel1VgwBgpAsn`|Optional|See the remote site's configuration for the "BGP Configuration Options" and the "Virtual Private  Gateway ASN" value.|`64512`|
 |`pTunnel1BgpNeighborIpAddress`|Required|See the remote site's configuration for the "BGP Configuration Options" and the "Neighbor IP Address" value.|None|
 |**VPN Tunnel 2**| | | |
 |`pTunnel2Psk`|Optional|See the remote site's configuration for the "IPSec Tunnel #2" section and "Pre-Shared Key" value. Required when using PSK-based authentication.|None|
-|`pTunnel2VgwCertCommonName`|Optional|Common name (CN) of certificate associated with tunenl 2. Required when using certificate-based authentication.|None|
+|`pTunnel2VgwCertDomainName`|Optional|The domain name of the certificate associated with tunnel 2. Required when using certificate-based authentication.|None|
 |`pTunnel2VgwOutsideIpAddress`|Required|See Tunnel 1.|None|
 |`pTunnel2CgwInsideCidr`|Required|See Tunnel 1.|None|
 |`pTunnel2VgwInsideCidr`|Required|See Tunnel 1.|None|
