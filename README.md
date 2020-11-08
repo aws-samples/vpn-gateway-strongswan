@@ -127,11 +127,11 @@ See [How do I create a certificate-based VPN using AWS Site-to-Site VPN?](https:
 
 Since VPN connections typically occur over the public Internet, you'll need to have at least one public IP address to represent the local side of the VPN tunnels.  You have several options to associate a public IP address. In either case, decoupling the creation and management of the public IP address from the creation and management of the VPN gateway enables you to replace the VPN gateway stack including the associated strongSwan EC2 instance without needing to reconfigure the remote end of the site-to-site VPN connection.
 
-#### Option 1: Deploy VPN Gateway in Public Subnet and Use Elastic IP Address
+#### 2a. Deploy VPN Gateway in Public Subnet and Use Elastic IP Address
 
 Before deploying this stack, create an Elastic IP (EIP) address and obtain its allocation ID so that you can pass it as a parameter to the CloudFormation stack through which the VPN gateway will be created.  When deploying this stack, you set the parameter `pUseElasticIp` to `true` and supply a value for the `pEipAllocationId` parameter.
 
-#### Option 2: Deploy VPN gateway in Private Subnet and Use a NAT Gateway
+#### 2b. Deploy VPN gateway in Private Subnet and Use a NAT Gateway
 
 In this case, you discover the public IP address of the NAT Gateway and use it when configuring the remote side of the VPN connection.  When deploying this stack, you accept the default `false` setting for the `pUseElasticIp` parameter. Since the local side of the site-to-site VPN initiates the connection, the local strongSwan VPN gateway will initiate the connection through the NAT Gateways public IP address.
 
