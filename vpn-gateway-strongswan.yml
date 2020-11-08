@@ -264,7 +264,7 @@ Parameters:
     AllowedValues: [true, false]
 
   pEipAllocationId:
-    Description: Elastic IP Address Alocation ID
+    Description: Elastic IP Address Allocation ID
     Type: String
     Default: ''
 
@@ -597,7 +597,7 @@ Resources:
               content: !If 
                 - cUseCertAuth
                 - |
-                  : RSA client-private-cert.pem {PASSPHRASE}          
+                  : RSA client-private-key.pem {PASSPHRASE}          
                 - !Sub |
                   ${pTunnel1VgwOutsideIpAddress} : PSK "${pTunnel1Psk}"
                   ${pTunnel2VgwOutsideIpAddress} : PSK "${pTunnel2Psk}"
@@ -764,7 +764,7 @@ Resources:
               owner: root 
               group: root
               authentication: "S3BucketAccessCredential"
-            /etc/strongswan/ipsec.d/private/client-private-cert.pem:
+            /etc/strongswan/ipsec.d/private/client-private-key.pem:
               source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pClientPrivateCert}"
               mode: '000600' 
               owner: root 
