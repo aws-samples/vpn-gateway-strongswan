@@ -200,8 +200,8 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |`pAuthType`|Optional|The type of authentication. Either `psk` or `pubkey`. Use `pubkey` for certificate-based authentication.|`psk`|
 |`pCertBucket`|Optional|Name of S3 bucket containing the following certificate files in `.pem` format. Required when using certificate-based authentication.|None|
 |`pClientPublicCert`|Optional|Name of client public certificate file residing in S3. Required when using certificate-based authentication.|None|
-|`pClientPrivateKey`|Optional|Name of client private certificate file residing in S3. Required when using certificate-based authentication.|None|
-|`pClientPrivateKeyPassphraseSecretName`|Optional|Name of secret in AWS Secrets Manager containing the passphrase for the client private certificate file residing in S3. Required when using certificate-based authentication.<br><br>AWS Secrets Manager secret must be in the form of `passphrase:<value>` where `passphrase` is the key and `<value>` is the passphrase value.|None|
+|`pClientPrivateKey`|Optional|Name of client private key file residing in S3. Required when using certificate-based authentication.|None|
+|`pClientPrivateKeyPassphraseSecretName`|Optional|Name of secret in AWS Secrets Manager containing the passphrase for the client private key file residing in S3. Required when using certificate-based authentication.<br><br>AWS Secrets Manager secret must be in the form of `passphrase:<value>` where `passphrase` is the key and `<value>` is the passphrase value.|None|
 |`pRootCaPublicCert`|Optional|Name of root CA certificate file residing in S3. Required when using certificate-based authentication.|None|
 |`pSubordinateCaPublicCert`|Optional|Name of subordinate CA certificate file residing in S3. Required when using certificate-based authentication.|None|
 |**VPN Tunnel 1**| | | |
