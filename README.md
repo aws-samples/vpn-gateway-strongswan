@@ -92,7 +92,7 @@ The customer gateway private certificate is signed by the subordinate CA.
 
 When you configure a customer gateway in your AWS environment, you’ll specify certificate-based authentication and associate your customer gateway private certificate with the customer gateway. 
 
-Later, when your VPN connection and tunnels are established, this association ensures that only a customer gateway that has this customer gateway private certificate can connect to your AWS environment.
+Later, when your VPN connection and tunnels are established, this association helps to ensure that only a customer gateway that has this customer gateway private certificate can connect to your AWS environment.
 
 #### Export certificates and customer gateway private key
 Once you’ve created the private CAs and the customer gateway private certificate, you’ll need to save copies of the associated certificates to your desktop copies. 
@@ -202,14 +202,14 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 
 * In support of testing, ensure that testing EC2 instances can receive ICMP or ping traffic.
 * Ensure VPC route tables associated with subnets route traffic destined for the other site to the local VPN gateway instance.
-* If using Transit Gateway on the remote site, ensure that VPC route tables are configured to route traffic destined for the other site to the Transit Gateway. (Although the built-in BGP support in this stack will ensure that both the local VPN gateway's route information and the remote Transit Gateway's route table will be automatically configuired, you still need to ensure that the VPC route tables in both sites are properly configured).
+* If using Transit Gateway on the remote site, ensure that VPC route tables are configured to route traffic destined for the other site to the Transit Gateway. (Although the built-in BGP support in this stack will help ensure that both the local VPN gateway's route information and the remote Transit Gateway's route table will be automatically configured, you still need to ensure that the VPC route tables in both sites are properly configured).
 
 ### 5. Test
 
 * Deploy an Amazon Linux EC2 instance to one of the local subnets.  
     * Ensure ICMP is allowed as inbound traffic.
     * Set it up for SSH access in one of two ways:
-      * Systems Manager Session Manager: No SSH and publicly accesible IP address required. Instead, create an IAM role for EC2 that includes the `AmazonSSMManagedInstanceCore` policy and attach it to the EC2 instance via the `Actions -> Instance Settings -> Attach/Replace IAM Role`.
+      * Systems Manager Session Manager: No SSH and publicly accessible IP address required. Instead, create an IAM role for EC2 that includes the `AmazonSSMManagedInstanceCore` policy and attach it to the EC2 instance via the `Actions -> Instance Settings -> Attach/Replace IAM Role`.
       * SSH: Ensure that the security group allows for SSH inbound access and that the instance has a publicly accessible IP address.
 * Deploy another EC2 instance in the remote site with the same configuration as above.
 * Validate that route tables and security groups are properly configured.
@@ -221,10 +221,10 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |Parameter|Required|Description|Default|
 |---------|--------|-----------|-------|
 |**System Classification and Environment**| | | |
-|`pOrg`|Optional|As an example of using resurce naming standards, include the business organization in the names of resources including, for example, IAM roles.|`example`|
-|`pSystem`|Optional|As an example of using resurce naming standards, include a system identifier in the names of resources including, for example, IAM roles..|`infra`|
-|`pApp`|Optional|As an example of using resurce naming standards, include an application identifier in the names of resources including, for example, IAM roles.|`vpngw`|
-|`pEnvPurpose`|Required|As an example of using resurce naming standards, include a purpose for this particulart instance of the stack in the names of resources including, for example, IAM roles.. For example, "dev1", "test", "1", etc.|None|
+|`pOrg`|Optional|As an example of using resource naming standards, include the business organization in the names of resources including, for example, IAM roles.|`example`|
+|`pSystem`|Optional|As an example of using resource naming standards, include a system identifier in the names of resources including, for example, IAM roles..|`infra`|
+|`pApp`|Optional|As an example of using resource naming standards, include an application identifier in the names of resources including, for example, IAM roles.|`vpngw`|
+|`pEnvPurpose`|Required|As an example of using resource naming standards, include a purpose for this particulart instance of the stack in the names of resources including, for example, IAM roles.. For example, "dev1", "test", "1", etc.|None|
 |**Authentication**| | | |
 |`pAuthType`|Optional|The type of authentication. Either `psk` or `pubkey`. Use `pubkey` for certificate-based authentication.|`psk`|
 |`pCertBucket`|Required when using certificate-based authentication.|Name of S3 bucket containing the following certificate files in `.pem` format.|None|
@@ -355,7 +355,7 @@ If you're using certificated-based authentication, you can inspect the certifica
 # strongswan listcacerts # list the CA certificates
 ```
 
-You can inspect the BGP routes that Quagga knows about by executing the `sudo vtysh` command followed by the `show ip bgp summary` subcommand. In the following example, the BGP tunnel neighors are listed:
+You can inspect the BGP routes that Quagga knows about by executing the `sudo vtysh` command followed by the `show ip bgp summary` subcommand. In the following example, the BGP tunnel neighbors are listed:
 
 ```
 $ sudo vtysh
