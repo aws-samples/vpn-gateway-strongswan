@@ -145,7 +145,7 @@ Review the data in this file in preparation for passing it as parameters to the 
 
 In this step you'll create a CloudFormation stack using the [`vpn-gateway-strongswan.yml`](https://raw.githubusercontent.com/aws-samples/vpn-gateway-strongwswan/master/vpn-gateway-strongswan.yml) template and configuration data obtained from the remote site's Site-to-Site VPN Connection resource.
 
-You can use either the AWS management console or an included helper script and the AWS CLI to create the stack.  Given the number of parameters involved, you will probably find it easier to use the CLI so that you can specify the parameter values once in a JSON file as opposed to entering them via the AWS management console. using the CLI approach also makes it easier to spin up new stack instances both in cases where failures occur and you want to change settings to experiment with features.
+You can use either the AWS management console or an included helper script and the AWS CLI to create the stack.  Given the number of parameters involved, you will probably find it easier to use the CLI so that you can specify the parameter values once in a JSON file as opposed to entering them via the AWS management console. Using the CLI approach also makes it easier to spin up new stack instances both in cases where failures occur and you want to change settings to experiment with features.
 
 #### Use AWS Management Console
 
@@ -266,13 +266,13 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 
 Verify your parameter settings against both your local network configuration and the configuration of the site-to-site tunnels.  If you're using an Elastic IP address, ensure that the allocation ID is correct.
 
-### Stack creation fails afer a long period of time
+### Stack creation fails after a long period of time
 
 You may find that the stack creation fails after multiple minutes and resources are rolled back.  In this case, it's best to delete the stack and use the CLI approach described above in an attempt to create the stack again.  However, this time, you'll use CloudWatch logs to inspect the progress of the first boot configuration steps during stack creation.
 
 Similar to the previous circumstance, verify your parameter settings against both your local network configuration and the configuration of the site-to-site tunnels.  If you're using an Elastic IP address, ensure that the allocation ID is correct.
 
-If no obvious issues are identified based on a review of the template parameters, delete the failed stack and use the CLI approach in an attempt to create the stack again.  This time, during stack creation, inspect the CloudWatch logs group to gain insight into failures that might be occuring during the first boot configuration process. For example, if the S3 bucket name for certificate key files is incorrect, the first boot configuration process may fail.
+If no obvious issues are identified based on a review of the template parameters, delete the failed stack and use the CLI approach in an attempt to create the stack again.  This time, during stack creation, inspect the CloudWatch logs group to gain insight into failures that might be occurring during the first boot configuration process. For example, if the S3 bucket name for certificate key files is incorrect, the first boot configuration process will fail.
 
 Specifically, access the `cfn-init.log` log stream to review the first boot configuration for any errors. By default, the log group for you EC2 instance will be named `/infra/vpngw/ec2/<environment purpose>`.
 
