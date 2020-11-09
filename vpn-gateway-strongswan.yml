@@ -22,11 +22,11 @@ Metadata:
       Parameters:
       - pAuthType
       - pCertBucket
-      - pClientPublicCert
-      - pClientPrivateKey
-      - pClientPrivateKeyPassphraseSecretName
-      - pRootCaPublicCert
-      - pSubordinateCaPublicCert
+      - pCgwCert
+      - pCgwPrivateKey
+      - pCgwPrivateKeyPassphraseSecretName
+      - pRootCaCert
+      - pSubordinateCaCert
     - Label:
         default: VPN Tunnel 1
       Parameters:
@@ -76,16 +76,16 @@ Metadata:
         default: "Authentication type: 'psk' - Pre-shared key or 'pubkey' - Certificate"
       pCertBucket:
         default: S3 Bucket Containing Certificates and Client Private Key
-      pClientPublicCert:
-        default: Client Public Certificate (S3 key)
-      pClientPrivateKey:
-        default: Client Private Key (S3 key)
-      pClientPrivateKeyPassphraseSecretName:
-        default: Name of secret in AWS Secrets Manager for Client Private Key Passphrase
-      pRootCaPublicCert:
-        default: Root CA Public Certificate (S3 key)
-      pSubordinateCaPublicCert:
-        default: Subordinate CA Public Certificate (S3 key)
+      pCgwCert:
+        default: Customer Gateway Certificate (S3 key)
+      pCgwPrivateKey:
+        default: Customer Gateway Private Key (S3 key)
+      pCgwPrivateKeyPassphraseSecretName:
+        default: Name of secret in AWS Secrets Manager for Customer Gateway Private Key Passphrase
+      pRootCaCert:
+        default: Root CA Certificate (S3 key)
+      pSubordinateCaCert:
+        default: Subordinate CA Certificate (S3 key)
 
       pTunnel1Psk:
         default: VPN Tunnel 1 Pre-Shared Key
@@ -166,32 +166,32 @@ Parameters:
       - pubkey
 
   pCertBucket:
-    Description: S3 Bucket Containing Certificates and Client Private Key. Required for certificate-based authentication.
+    Description: S3 Bucket Containing Certificates and Customer Gateway Private Key. Required for certificate-based authentication.
     Type: String
     Default: ''
 
-  pClientPublicCert:
-    Description: Client Public Certificate (S3 key). Required for certificate-based authentication.
+  pCgwCert:
+    Description: Customer Gateway Certificate (S3 key). Required for certificate-based authentication.
     Type: String
     Default: ''
   
-  pClientPrivateKey:
-    Description: Client Private Key (S3 key). Required for certificate-based authentication.
+  pCgwPrivateKey:
+    Description: Customer Gateway Private Key (S3 key). Required for certificate-based authentication.
     Type: String
     Default: ''
 
-  pClientPrivateKeyPassphraseSecretName:
-    Description: Name of secret in AWS Secrets Manager for Client Private Key Passphrase. Required for certificate-based authentication.
+  pCgwPrivateKeyPassphraseSecretName:
+    Description: Name of secret in AWS Secrets Manager for Customer Gateway Private Key Passphrase. Required for certificate-based authentication.
     Type: String
     Default: ''
 
-  pRootCaPublicCert:
-    Description: Root CA Public Certificate (S3 key). Required for certificate-based authentication.
+  pRootCaCert:
+    Description: Root CA Certificate (S3 key). Required for certificate-based authentication.
     Type: String
     Default: ''
 
-  pSubordinateCaPublicCert:
-    Description: Subordinate CA Public Certificate (S3 key). Required for certificate-based authentication.
+  pSubordinateCaCert:
+    Description: Subordinate CA Certificate (S3 key). Required for certificate-based authentication.
     Type: String
     Default: ''
 
@@ -747,25 +747,25 @@ Resources:
         05-ConfigureVpnGatewayCertFiles:
           files:
             /etc/strongswan/ipsec.d/cacerts/root-ca.pem: 
-              source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pRootCaPublicCert}"
+              source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pRootCaCert}"
               mode: '000600'
               owner: root 
               group: root
               authentication: "S3BucketAccessCredential"
             /etc/strongswan/ipsec.d/cacerts/subordinate-ca.pem:
-              source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pSubordinateCaPublicCert}"
+              source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pSubordinateCaCert}"
               mode: '000600' 
               owner: root 
               group: root
               authentication: "S3BucketAccessCredential"
             /etc/strongswan/ipsec.d/certs/client-public-cert.pem:
-              source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pClientPublicCert}"
+              source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pCgwCert}"
               mode: '000600'
               owner: root 
               group: root
               authentication: "S3BucketAccessCredential"
             /etc/strongswan/ipsec.d/private/client-private-key.pem:
-              source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pClientPrivateKey}"
+              source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pCgwPrivateKey}"
               mode: '000600' 
               owner: root 
               group: root
@@ -774,7 +774,7 @@ Resources:
               content: !Sub |
                 #!/bin/bash
                 
-                PASSPHRASE=$(aws secretsmanager get-secret-value --secret-id ${pClientPrivateKeyPassphraseSecretName} --region ${AWS::Region} | jq -r '.SecretString' | jq -r '.passphrase') &&
+                PASSPHRASE=$(aws secretsmanager get-secret-value --secret-id ${pCgwPrivateKeyPassphraseSecretName} --region ${AWS::Region} | jq -r '.SecretString' | jq -r '.passphrase') &&
                 
                 if test -z "$PASSPHRASE"
                 then
@@ -904,7 +904,7 @@ Resources:
             Action:
               - secretsmanager:GetSecretValue
               - secretsmanager:DescribeSecret
-            Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${pClientPrivateKeyPassphraseSecretName}-*'
+            Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${pCgwPrivateKeyPassphraseSecretName}-*'
       Roles:
         - !Ref rRole
 

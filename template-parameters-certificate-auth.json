@@ -24,23 +24,23 @@
     "ParameterValue": "example-certs"
   },
   {
-    "ParameterKey": "pClientPublicCert",
+    "ParameterKey": "pCgwCert",
     "ParameterValue": "example-cloud-vpn-cert.pem"
   },
   {
-    "ParameterKey": "pClientPrivateKey",
+    "ParameterKey": "pCgwPrivateKey",
     "ParameterValue": "example-cloud-vpn-private-key.pem"
   },
   {
-    "ParameterKey": "pClientPrivateKeyPassphraseSecretName",
+    "ParameterKey": "pCgwPrivateKeyPassphraseSecretName",
     "ParameterValue": "..."
   },
   {
-    "ParameterKey": "pRootCaPublicCert",
+    "ParameterKey": "pRootCaCert",
     "ParameterValue": "example-cloud-root-ca.pem"
   },
   {
-    "ParameterKey": "pSubordinateCaPublicCert",
+    "ParameterKey": "pSubordinateCaCert",
     "ParameterValue": "example-cloud-subordinate-ca.pem"
   },
   {
