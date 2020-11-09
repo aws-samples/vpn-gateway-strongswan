@@ -227,23 +227,23 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |`pEnvPurpose`|Required|As an example of using resurce naming standards, include a purpose for this particulart instance of the stack in the names of resources including, for example, IAM roles.. For example, "dev1", "test", "1", etc.|None|
 |**Authentication**| | | |
 |`pAuthType`|Optional|The type of authentication. Either `psk` or `pubkey`. Use `pubkey` for certificate-based authentication.|`psk`|
-|`pCertBucket`|Optional|Name of S3 bucket containing the following certificate files in `.pem` format. Required when using certificate-based authentication.|None|
-|`pCgwCert`|Optional|Name of customer gateway certificate file residing in S3. Required when using certificate-based authentication.|None|
-|`pCgwPrivateKey`|Optional|Name of customer gateway private key file residing in S3. Required when using certificate-based authentication.|None|
-|`pCgwPrivateKeyPassphraseSecretName`|Optional|Name of secret in AWS Secrets Manager containing the passphrase for the customer gateway private key file residing in S3. Required when using certificate-based authentication.<br><br>AWS Secrets Manager secret must be in the form of `passphrase:<value>` where `passphrase` is the key and `<value>` is the passphrase value.|None|
-|`pRootCaCert`|Optional|Name of root CA certificate file residing in S3. Required when using certificate-based authentication.|None|
-|`pSubordinateCaCert`|Optional|Name of subordinate CA certificate file residing in S3. Required when using certificate-based authentication.|None|
+|`pCertBucket`|Required when using certificate-based authentication.|Name of S3 bucket containing the following certificate files in `.pem` format.|None|
+|`pCgwCert`|Required when using certificate-based authentication.|Name of customer gateway certificate file residing in S3.|None|
+|`pCgwPrivateKey`|Required when using certificate-based authentication.|Name of customer gateway private key file residing in S3.|None|
+|`pCgwPrivateKeyPassphraseSecretName`|Required when using certificate-based authentication.|Name of secret in AWS Secrets Manager containing the passphrase for the customer gateway private key file residing in S3. Required when using certificate-based authentication.<br><br>AWS Secrets Manager secret must be in the form of `passphrase:<value>` where `passphrase` is the key and `<value>` is the passphrase value.|None|
+|`pRootCaCert`|Required when using certificate-based authentication.|Name of root CA certificate file residing in S3. Required when using certificate-based authentication.|None|
+|`pSubordinateCaCert`|Required when using certificate-based authentication.|Name of subordinate CA certificate file residing in S3. Required when using certificate-based authentication.|None|
 |**VPN Tunnel 1**| | | |
-|`pTunnel1Psk`|Optional|See the remote site's configuration for the "IPSec Tunnel #1" section and "Pre-Shared Key" value. Required when using PSK-based authentication.|None|
-|`pTunnel1VgwCertDomainName`|Optional|The domain name of the private certificate associated with tunnel 1. Required when using certificate-based authentication.<br><br>You can obtain this value from accessing your site-to-site VPN connection in your AWS environment, selecting the "Tunnel Details" tab, and selecting the "Certificate ARN".|None|
+|`pTunnel1Psk`|Required when using PSK-based authentication.|See the remote site's configuration for the "IPSec Tunnel #1" section and "Pre-Shared Key" value. Required when using PSK-based authentication.|None|
+|`pTunnel1VgwCertDomainName`|Required when using certificate-based authentication.|The domain name of the private certificate associated with tunnel 1. Required when using certificate-based authentication.<br><br>You can obtain this value from accessing your site-to-site VPN connection in your AWS environment, selecting the "Tunnel Details" tab, and selecting the "Certificate ARN".|None|
 |`pTunnel1VgwOutsideIpAddress`|Required|See the remote site's configuration for the "IPSec Tunnel #1" section, "Outside IP Addresses" section and "Virtual Private Gateway" value.|None|
 |`pTunnel1CgwInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" section, "Inside IP Addresses" section and "Customer Gateway" value.|None|
 |`pTunnel1VgwInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" section, "Inside IP Addresses" section and "Virtual Private Gateway" value.|None|
 |`pTunnel1VgwBgpAsn`|Optional|See the remote site's configuration for the "BGP Configuration Options" and the "Virtual Private  Gateway ASN" value.|`64512`|
 |`pTunnel1BgpNeighborIpAddress`|Required|See the remote site's configuration for the "BGP Configuration Options" and the "Neighbor IP Address" value.|None|
 |**VPN Tunnel 2**| | | |
-|`pTunnel2Psk`|Optional|See the remote site's configuration for the "IPSec Tunnel #2" section and "Pre-Shared Key" value. Required when using PSK-based authentication.|None|
-|`pTunnel2VgwCertDomainName`|Optional|The domain name of the certificate associated with tunnel 2. Required when using certificate-based authentication.|None|
+|`pTunnel2Psk`|Required when using PSK-based authentication.|See the remote site's configuration for the "IPSec Tunnel #2" section and "Pre-Shared Key" value. Required when using PSK-based authentication.|None|
+|`pTunnel2VgwCertDomainName`|Required when using certificate-based authentication.|The domain name of the certificate associated with tunnel 2. Required when using certificate-based authentication.|None|
 |`pTunnel2VgwOutsideIpAddress`|Required|See Tunnel 1.|None|
 |`pTunnel2CgwInsideCidr`|Required|See Tunnel 1.|None|
 |`pTunnel2VgwInsideCidr`|Required|See Tunnel 1.|None|
@@ -254,7 +254,7 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |`pVpcCidr`|Required|The CIDR block of the local VPC. Used to advertise via BGP routing information to the remote site.|None|
 |`pSubnetId`|Required|The subnet in which the VPN gateway is to be deployed.|None|
 |`pUseElasticIp`|Optional|Use elastic IP address?|`true`|
-|`pEipAllocationId`|Conditional|The allocation ID of the Elastic IP address that is to be associated with the VPN gateway. Required when `pUseElasticIP` = `true`|None|
+|`pEipAllocationId`|Required when `pUseElasticIP` = `true`|The allocation ID of the Elastic IP address that is to be associated with the VPN gateway.|None|
 |`pLocalBgpAsn`|Optional|The BGP Autonomous System Number (ASN) used to represent the local end of the site-to-site VPN connection.|`65000`|
 |**EC2 Instance**| | | |
 |`pAmiId`|Optional|The ID of the AMI to use for the VPN gateway. By default this Systems Manager Parameter Store key is used to lookup the latest version of the referenced AMI for use in the current region.|`/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-ebs`|
