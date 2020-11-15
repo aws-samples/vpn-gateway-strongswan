@@ -175,17 +175,16 @@ If you have the AWS CLI installed, you might find it easier to use the included 
 
 |Option Argument|Required?|Description|Default|
 |---------|--------|-----------|-------|
-|`-e` or `--env-purpose`|Conditional. Required when `-stack-name` is not specified.|Use to qualify the stack name of the form `vpn-gateway-<env-purpose>`. For example, `-e mytest` results in a stack name of `vpn-gateway-mytest`.|None|
-|`-s` or `--stack-name`|Conditional. Required when `--env-purpose` is not specified.|Specifies the name to assign to the newly created stack.|None|
+|`-s` or `--stack-name`| Required|Specifies the name to assign to the newly created stack.|None|
 |`-r` or `--region`|Optional|AWS region. Since the `aws` CLI is used, the standard environment variables are honored.|The `aws` CLI will use the standard `AWS_DEFAULT_REGION` environment variable if set.|
 |`-p` or `--profile`|Optional|AWS profile. Since the `aws` CLI is used, the standard environment variables are honored.|The `aws` CLI will use the standard `AWS_PROFILE` environment variable if set.|
 
 An example execution:
 
 ```
-$ ./manage-stack -e mystack1 --region us-east-1 template-parameters-certificate-auth.json
+$ ./manage-stack -s vpn-gateway-1 --region us-east-1 template-parameters-certificate-auth.json
 ```
-Execution of this command would result in an attempt to create a new stack of the name `vpn-gateway-mystack1`.
+Execution of this command would result in an attempt to create a new stack of the name `vpn-gateway-1`.
 
 Monitor the progress of stack creation via the AWS management console.
 
@@ -225,16 +224,17 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |`pSystem`|Optional|As an example of using resource naming standards, include a system identifier in the names of resources including, for example, IAM roles..|`infra`|
 |`pApp`|Optional|As an example of using resource naming standards, include an application identifier in the names of resources including, for example, IAM roles.|`vpngw`|
 |`pEnvPurpose`|Required|As an example of using resource naming standards, include a purpose for this particulart instance of the stack in the names of resources including, for example, IAM roles.. For example, "dev1", "test", "1", etc.|None|
-|**Authentication**| | | |
-|`pAuthType`|Optional|The type of authentication. Either `psk` or `pubkey`. Use `pubkey` for certificate-based authentication.|`psk`|
+|**Authentication Type**| | | |
+|`pAuthType`|Optional|The type of authentication. Either `psk` or `pubkey`. Use `pubkey` for certificate-based authentication and `psk` for private shared key-based authentication.|`psk`|
+|**Certificate-Based Authentication**| | | |
 |`pCertBucket`|Required when using certificate-based authentication.|Name of S3 bucket containing the following certificate files in `.pem` format.|None|
 |`pCgwCert`|Required when using certificate-based authentication.|Name of customer gateway certificate file residing in S3.|None|
 |`pCgwPrivateKey`|Required when using certificate-based authentication.|Name of customer gateway private key file residing in S3.|None|
-|`pCgwPrivateKeyPassphraseSecretName`|Required when using certificate-based authentication.|Name of secret in AWS Secrets Manager containing the passphrase for the customer gateway private key file residing in S3. Required when using certificate-based authentication.<br><br>AWS Secrets Manager secret must be in the form of `passphrase:<value>` where `passphrase` is the key and `<value>` is the passphrase value.|None|
+|`pCgwPrivateKeyPassphraseSecretName`|Required when using certificate-based authentication.|Name of secret in AWS Secrets Manager containing the passphrase for the customer gateway private key file residing in S3.<br><br>AWS Secrets Manager secret must be in the form of `passphrase:<value>` where `passphrase` is the key and `<value>` is the passphrase value.|None|
 |`pRootCaCert`|Required when using certificate-based authentication.|Name of root CA certificate file residing in S3. Required when using certificate-based authentication.|None|
 |`pSubordinateCaCert`|Required when using certificate-based authentication.|Name of subordinate CA certificate file residing in S3. Required when using certificate-based authentication.|None|
 |**VPN Tunnel 1**| | | |
-|`pTunnel1Psk`|Required when using PSK-based authentication.|See the remote site's configuration for the "IPSec Tunnel #1" section and "Pre-Shared Key" value. Required when using PSK-based authentication.|None|
+|`pTunnel1PskSecretName`|Required when using PSK-based authentication.|Name of secret in AWS Secrets Manager containing the private shared key for tunnel 1.<br><br>AWS Secrets Manager secret must be in the form of `psk:<value>` where `psk` is the key and `<value>` is the private shared key value.<br><br>See the remote site's configuration for the "IPSec Tunnel #1" section and "Pre-Shared Key" value.|None|
 |`pTunnel1VgwCertDomainName`|Required when using certificate-based authentication.|The domain name of the private certificate associated with tunnel 1. Required when using certificate-based authentication.<br><br>You can obtain this value from accessing your site-to-site VPN connection in your AWS environment, selecting the "Tunnel Details" tab, and selecting the "Certificate ARN".|None|
 |`pTunnel1VgwOutsideIpAddress`|Required|See the remote site's configuration for the "IPSec Tunnel #1" section, "Outside IP Addresses" section and "Virtual Private Gateway" value.|None|
 |`pTunnel1CgwInsideCidr`|Required|See the remote site's configuration for the "IPSec Tunnel #1" section, "Inside IP Addresses" section and "Customer Gateway" value.|None|
@@ -242,7 +242,7 @@ On both sides of the site-to-site VPN connection, ensure that the appropriate ro
 |`pTunnel1VgwBgpAsn`|Optional|See the remote site's configuration for the "BGP Configuration Options" and the "Virtual Private  Gateway ASN" value.|`64512`|
 |`pTunnel1BgpNeighborIpAddress`|Required|See the remote site's configuration for the "BGP Configuration Options" and the "Neighbor IP Address" value.|None|
 |**VPN Tunnel 2**| | | |
-|`pTunnel2Psk`|Required when using PSK-based authentication.|See the remote site's configuration for the "IPSec Tunnel #2" section and "Pre-Shared Key" value. Required when using PSK-based authentication.|None|
+|`pTunnel2PskSecretName`|Required when using PSK-based authentication.|Name of secret in AWS Secrets Manager containing the private shared key for tunnel 2.<br><br>AWS Secrets Manager secret must be in the form of `psk:<value>` where `psk` is the key and `<value>` is the private shared key value.<br><br>See the remote site's configuration for the "IPSec Tunnel #2" section and "Pre-Shared Key" value.|None|
 |`pTunnel2VgwCertDomainName`|Required when using certificate-based authentication.|The domain name of the certificate associated with tunnel 2. Required when using certificate-based authentication.|None|
 |`pTunnel2VgwOutsideIpAddress`|Required|See Tunnel 1.|None|
 |`pTunnel2CgwInsideCidr`|Required|See Tunnel 1.|None|

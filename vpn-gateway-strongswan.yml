@@ -30,7 +30,7 @@ Metadata:
     - Label:
         default: VPN Tunnel 1
       Parameters:
-      - pTunnel1Psk
+      - pTunnel1PskSecretName
       - pTunnel1VgwCertDomainName
       - pTunnel1VgwOutsideIpAddress
       - pTunnel1CgwInsideIpAddress
@@ -40,7 +40,7 @@ Metadata:
     - Label:
         default: VPN Tunnel 2
       Parameters:
-      - pTunnel2Psk
+      - pTunnel2PskSecretName
       - pTunnel2VgwCertDomainName
       - pTunnel2VgwOutsideIpAddress
       - pTunnel2CgwInsideIpAddress
@@ -87,8 +87,8 @@ Metadata:
       pSubordinateCaCert:
         default: Subordinate CA Certificate (S3 key)
 
-      pTunnel1Psk:
-        default: VPN Tunnel 1 Pre-Shared Key
+      pTunnel1PskSecretName:
+        default: Name of secret in AWS Secrets Manager for VPN Tunnel 1 Pre-Shared Key
       pTunnel1VgwCertDomainName:
         default: VPN Tunnel 1 Virtual Private Gateway Domain Name - Certificate Authentication. e.g vpn-07..78.endpoint-0
       pTunnel1VgwOutsideIpAddress:
@@ -102,8 +102,8 @@ Metadata:
       pTunnel1BgpNeighborIpAddress:
         default: VPN Tunnel 1 BGP Neighbor IP Address
 
-      pTunnel2Psk:
-        default: VPN Tunnel 2 Pre-Shared Key
+      pTunnel2PskSecretName:
+        default: Name of secret in AWS Secrets Manager for VPN Tunnel 2 Pre-Shared Key
       pTunnel2VgwCertDomainName:
         default: VPN Tunnel 2 Virtual Private Gateway Domain Name - Certificate Authentication. e.g vpn-07..78.endpoint-1
       pTunnel2VgwOutsideIpAddress:
@@ -195,8 +195,8 @@ Parameters:
     Type: String
     Default: ''
 
-  pTunnel1Psk:
-    Description: VPN Tunnel 1 Pre-Shared Key. Required for PSK-based authentication.
+  pTunnel1PskSecretName:
+    Description: Name of secret in AWS Secrets Manager for VPN Tunnel 1 Pre-Shared Key. Required for PSK-based authentication.
     Type: String
     Default: ''
 
@@ -228,8 +228,8 @@ Parameters:
     Description: VPN Tunnel 1 BGP Neighbor IP Address
     Type: String
   
-  pTunnel2Psk:
-    Description: VPN Tunnel 2 Pre-Shared Key. Required for PSK-based authentication.
+  pTunnel2PskSecretName:
+    Description: Name of secret in AWS Secrets Manager for VPN Tunnel 2 Pre-Shared Key. Required for PSK-based authentication.
     Type: String
     Default: ''
 
@@ -318,6 +318,7 @@ Rules:
 
 Conditions:
   cUseCertAuth:  !Equals [ !Ref 'pAuthType', 'pubkey' ]
+  cUsePskAuth:   !Equals [ !Ref 'pAuthType', 'psk' ]
   cUseElasticIp: !Equals [ !Ref 'pUseElasticIp', true ]
 
 Resources:
@@ -398,6 +399,7 @@ Resources:
             - 02-ConfigureCloudWatchLogsAgent
             - 03-InstallEpel
             - 04-ConfigureVpnGatewayConfig
+            - 05-ConfigureVpnGatewaySecretsPsk
             - 06-ConfigureVpnGatewayCommands
           pubkey:
             - 01-ConfigureCloudWatchMetrics
@@ -593,17 +595,6 @@ Resources:
               mode: '000600'
               owner: root
               group: root
-            /etc/strongswan/ipsec.secrets:
-              content: !If 
-                - cUseCertAuth
-                - |
-                  : RSA client-private-key.pem {PASSPHRASE}          
-                - !Sub |
-                  ${pTunnel1VgwOutsideIpAddress} : PSK "${pTunnel1Psk}"
-                  ${pTunnel2VgwOutsideIpAddress} : PSK "${pTunnel2Psk}"
-              mode: '000600'
-              owner: root
-              group: root
             /etc/strongswan/ipsec-vti.sh:
               content: !Sub |
                 #!/bin/bash
@@ -744,6 +735,46 @@ Resources:
               mode: '000600'
               owner: root
               group: root
+        05-ConfigureVpnGatewaySecretsPsk:
+          files:
+            /etc/strongswan/ipsec.secrets:
+              content: !Sub |
+                  ${pTunnel1VgwOutsideIpAddress} : PSK "{TUNNEL_1_PSK}"
+                  ${pTunnel2VgwOutsideIpAddress} : PSK "{TUNNEL_2_PSK}"
+              mode: '000600'
+              owner: root
+              group: root
+            /tmp/set-psk.sh:
+              content: !Sub |
+                !/bin/bash
+
+                for (( i=0; i<2; ++i)); do
+                  TUNNEL_NUM=$((${!i} + 1))
+                  
+                  if (( $TUNNEL_NUM == 1 )) ; then
+                    SECRET_NAME=${pTunnel1PskSecretName}
+                  else
+                    SECRET_NAME=${pTunnel2PskSecretName}
+                  fi
+
+                  PSK=$(aws secretsmanager get-secret-value --secret-id ${!SECRET_NAME} --region us-east-2 | jq -r '.SecretString' | jq -r '.psk') &&
+                  
+                  if test -z "$PSK"
+                  then
+                    echo "\$PSK is empty"
+                    exit 1
+                  else
+                    echo "\$PSK is NOT empty"
+                    sed -i -e "s/{TUNNEL_${!TUNNEL_NUM}_PSK}/${!PSK}/" /etc/strongswan/ipsec.secrets
+                  fi
+                done
+              mode: '000700'
+              owner: root
+              group: root
+          commands:
+            00-set-psk:
+              command: >- 
+                /tmp/set-psk.sh
         05-ConfigureVpnGatewayCertFiles:
           files:
             /etc/strongswan/ipsec.d/cacerts/root-ca.pem: 
@@ -770,6 +801,12 @@ Resources:
               owner: root 
               group: root
               authentication: "S3BucketAccessCredential"
+            /etc/strongswan/ipsec.secrets:
+              content: |
+                  : RSA client-private-key.pem {PASSPHRASE}
+              mode: '000600'
+              owner: root
+              group: root
             /tmp/set-passphrase.sh:
               content: !Sub |
                 #!/bin/bash
@@ -892,7 +929,7 @@ Resources:
       Roles:
         - !Ref rRole
 
-  rPolicySecretsManager:
+  rPolicySecretsManagerCertAuth:
     Type: AWS::IAM::Policy
     Condition: cUseCertAuth
     Properties:
@@ -905,6 +942,24 @@ Resources:
               - secretsmanager:GetSecretValue
               - secretsmanager:DescribeSecret
             Resource: !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${pCgwPrivateKeyPassphraseSecretName}-*'
+      Roles:
+        - !Ref rRole
+
+  rPolicySecretsManagerPskAuth:
+    Type: AWS::IAM::Policy
+    Condition: cUsePskAuth
+    Properties:
+      PolicyName: !Sub '${pOrg}-${pSystem}-${pApp}-${pEnvPurpose}-secrets-manager-read-only'
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - secretsmanager:GetSecretValue
+              - secretsmanager:DescribeSecret
+            Resource: 
+              - !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${pTunnel1PskSecretName}-*'
+              - !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${pTunnel2PskSecretName}-*'
       Roles:
         - !Ref rRole
 

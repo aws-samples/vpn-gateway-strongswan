@@ -20,7 +20,7 @@
     "ParameterValue": "psk"
   },
   {
-    "ParameterKey": "pTunnel1Psk",
+    "ParameterKey": "pTunnel1PskSecretName",
     "ParameterValue": "..."
   },
   {
@@ -44,7 +44,7 @@
     "ParameterValue": "n.n.n.n"
   },
   {
-    "ParameterKey": "pTunnel2Psk",
+    "ParameterKey": "pTunnel2PskSecretName",
     "ParameterValue": "..."
   },
   {

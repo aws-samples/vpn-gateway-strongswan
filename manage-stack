@@ -13,10 +13,6 @@ while (( "$#" )); do
       STACK_NAME_ARG=$2
       shift 2
       ;;
-    -e|--env-purpose)
-      ENV_PURPOSE_ARG=$2
-      shift 2
-      ;;
     -t|--template)
       TEMPLATE_ARG=$2
       shift 2
@@ -52,19 +48,9 @@ else
   CMD='update-stack'
 fi
 
-if [ -z ${ENV_PURPOSE_ARG+x} ]; then
-  ENV_PURPOSE=
-else
-  ENV_PURPOSE=$ENV_PURPOSE_ARG
-fi
-
 if [ -z ${STACK_NAME_ARG+x} ]; then
-  if [ -z ${ENV_PURPOSE_ARG+x} ]; then
-    echo 'Must supply either --env-purpose|-e or -s|--stack-name'
-    exit 1
-  else
-    STACK_NAME=vpn-gateway-${ENV_PURPOSE}
-  fi
+  echo 'You must supply -s|--stack-name'
+  exit 1
 else
   STACK_NAME=$STACK_NAME_ARG
 fi
