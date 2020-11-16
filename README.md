@@ -74,7 +74,9 @@ This template supports pre-shared key- and certificate-based authentication.
 
 ### 1a. Pre-Shared Key-Based Authentication
 
-You'll obtain the the pre-shared keys for the two tunnels after you've configured the site-to-site VPN connection.
+You'll obtain the the pre-shared keys (PSKs) for the two tunnels after you've configured the site-to-site VPN connection. 
+
+You’ll need to create two secrets in AWS Secrets Manager in your simulated on-premises environment to store the PSKs so that your VPN gateway can retrieve them upon first boot when the strongSwan stack is configured.
 
 ### 1b. Certificate-Based Authentication
 
@@ -115,7 +117,7 @@ Before you can create the CloudFormation stack for your strongSwan VPN gateway i
 
 First, you’ll need to upload the certificates and customer gateway private key to an S3 bucket that is accessible from your simulated on-premises environment.
 
-Next, you’ll also need to create a secret in AWS Secrets Manager and store the passphrase to decrypt the customer gateway private key in that secret. 
+Next, you’ll need to create a secret in AWS Secrets Manager and store the passphrase to decrypt the customer gateway private key in that secret. 
 
 The following diagram shows the certificates and the customer gateway private key stored in an S3 bucket. The passphrase for the customer gateway private key is stored in a secret in AWS secrets manager.
 
@@ -140,6 +142,12 @@ In this case, you discover the public IP address of the NAT Gateway and use it w
 When using either AWS VGWs or TGWs for the remote end of the site-to-site VPN connection, a site-to-site VPN connection resource will be established in AWS on the remote site. Within the site-to-site VPN connection resource on the remote site, you can download a VPN configuration file that will provide you with much of the data required to deploy the local VPN gateway. In the AWS management console, see `VPC -> Site-to-Site VPN Connections`, select the connection of interest, click `Download` and select the `Generic` option for `Vendor` and download the configuration file.
 
 Review the data in this file in preparation for passing it as parameters to the CloudFormation stack in the next step.
+
+#### Using PSK-based authentication
+
+If you're using PSK-based authentication, you'll need to create two secrets in AWS Secrets Manager in your simulated on-premises environment.  You can find PSK values in the VPN tunnel configuration file under the "IPSec Tunnel #1" and "IPSec Tunnel #2" sections and "Pre-Shared Key" value.
+
+Each of the AWS Secrets Manager secrets for the PSK values must be in the form of `psk:<value>` where `psk` is the key and `<value>` is the private shared key value.
 
 ### 4. Deploy VPN Gateway Stack
 
