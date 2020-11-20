@@ -746,7 +746,7 @@ Resources:
               group: root
             /tmp/set-psk.sh:
               content: !Sub |
-                !/bin/bash
+                #!/bin/bash
 
                 for (( i=0; i<2; ++i)); do
                   TUNNEL_NUM=$((${!i} + 1))
