@@ -63,7 +63,7 @@ Metadata:
       - pInstanceType
 
     ParameterLabels:
-      pOrg:
+      pOr:
         default: Organization Identifier
       pSystem:
         default: System Identifier
