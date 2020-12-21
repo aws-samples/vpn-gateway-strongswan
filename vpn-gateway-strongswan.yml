@@ -790,7 +790,7 @@ Resources:
               group: root
             /tmp/set-psk.sh:
               content: !Sub |
-                !/bin/bash
+                #!/bin/bash
 
                 for (( i=0; i<2; ++i)); do
                   TUNNEL_NUM=$((${!i} + 1))
@@ -801,7 +801,7 @@ Resources:
                     SECRET_NAME=${pTunnel2PskSecretName}
                   fi
 
-                  PSK=$(aws secretsmanager get-secret-value --secret-id ${!SECRET_NAME} --region us-east-2 | jq -r '.SecretString' | jq -r '.psk') &&
+                  PSK=$(aws secretsmanager get-secret-value --secret-id ${!SECRET_NAME} --region ${AWS::Region} | jq -r '.SecretString' | jq -r '.psk') &&
                   
                   if test -z "$PSK"
                   then
