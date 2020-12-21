@@ -377,15 +377,18 @@ Resources:
         UserData:
           Fn::Base64: !Sub |
             #!/bin/bash -xe
-            yum install -y aws-cfn-bootstrap
 
-            /opt/aws/bin/cfn-init -v \
+            yum install -y amazon-cloudwatch-agent
+
+            /opt/aws/bin/cfn-init \
+                --verbose \
                 --stack ${AWS::StackName} \
                 --resource rLaunchTemplate \
                 --configsets ${pAuthType} \
                 --region ${AWS::Region}
 
-            /opt/aws/bin/cfn-signal -e $? \
+            /opt/aws/bin/cfn-signal \
+                --exit-code $? \
                 '${rVpnGatewayWaitHandle}'
     Metadata:
       AWS::CloudFormation::Authentication:
@@ -395,119 +398,160 @@ Resources:
       AWS::CloudFormation::Init:
         configSets:
           psk:
-            - 01-ConfigureCloudWatchMetrics
-            - 02-ConfigureCloudWatchLogsAgent
-            - 03-InstallEpel
-            - 04-ConfigureVpnGatewayConfig
-            - 05-ConfigureVpnGatewaySecretsPsk
-            - 06-ConfigureVpnGatewayCommands
+            - 01-config-cloudwatch-agent
+            - 02-restart-cloudwatch-agent
+            - 03-install-epel
+            - 04-config-vpn-gateway-config
+            - 05-config-vpn-gateway-secrets-psk
+            - 06-config-vpn-gateway-commands
           pubkey:
-            - 01-ConfigureCloudWatchMetrics
-            - 02-ConfigureCloudWatchLogsAgent
-            - 03-InstallEpel
-            - 04-ConfigureVpnGatewayConfig
-            - 05-ConfigureVpnGatewayCertFiles
-            - 06-ConfigureVpnGatewayCommands
-        01-ConfigureCloudWatchMetrics:
-          packages:
-            yum:
-              perl-Switch: []
-              perl-DateTime: []
-              perl-Sys-Syslog: []
-              perl-LWP-Protocol-https: []
-              perl-Digest-SHA.x86_64: []
-          sources:
-            /home/ec2-user: >-
-              https://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.2.zip
+            - 01-config-cloudwatch-agent
+            - 02-restart-cloudwatch-agent
+            - 03-install-epel
+            - 04-config-vpn-gateway-config
+            - 05-config-vpn-gateway-cert-files
+            - 06-config-vpn-gateway-commands
+        01-config-cloudwatch-agent:
           files:
-            /home/ec2-user/crontab:
+            /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json:
               content: !Sub |
-                */1 * * * * ~/aws-scripts-mon/mon-put-instance-data.pl --aws-iam-role=${rRole} --mem-used --memory-units=megabytes --mem-util --disk-space-util --disk-space-used --disk-space-avail --disk-path=/
-              mode: '000600'
-              owner: ec2-user
-              group: ec2-user
-          commands:
-            01-yum-update:
-              command: yum update -y
-            02-monitoring-cron:
-              command: >-
-                chmod +x /home/ec2-user/aws-scripts-mon/*.pl && crontab -u
-                ec2-user /home/ec2-user/crontab && rm /home/ec2-user/crontab
-        02-ConfigureCloudWatchLogsAgent:
-          packages:
-            yum:
-              awslogs: []
-          files:
-            /etc/awslogs/awslogs.conf:
-              content: !Sub |
-                [general]
-                state_file= /var/awslogs/state/agent-state
-
-                [/var/log/cloud-init.log]
-                file = /var/log/cloud-init.log
-                log_group_name = ${rCloudWatchLogsAgentGroup}
-                log_stream_name = {instance_id}/cloud-init.log
-                datetime_format =
-
-                [/var/log/cloud-init-output.log]
-                file = /var/log/cloud-init-output.log
-                log_group_name = ${rCloudWatchLogsAgentGroup}
-                log_stream_name = {instance_id}/cloud-init-output.log
-                datetime_format =
-
-                [/var/log/cfn-init.log]
-                file = /var/log/cfn-init.log
-                log_group_name = ${rCloudWatchLogsAgentGroup}
-                log_stream_name = {instance_id}/cfn-init.log
-                datetime_format =
-
-                [/var/log/cfn-wire.log]
-                file = /var/log/cfn-wire.log
-                log_group_name = ${rCloudWatchLogsAgentGroup}
-                log_stream_name = {instance_id}/cfn-wire.log
-                datetime_format =
-
-                [/var/log/charon.log]
-                file = /var/log/charon.log
-                log_group_name = ${rCloudWatchLogsAgentGroup}
-                log_stream_name = {instance_id}/charon.log
-                datetime_format =
-
-                [/var/log/quagga/zebra.log]
-                file = /var/log/quagga/zebra.log
-                log_group_name = ${rCloudWatchLogsAgentGroup}
-                log_stream_name = {instance_id}/zebra.log
-                datetime_format =
-
-                [/var/log/quagga/bgpd.log]
-                file = /var/log/quagga/bgpd.log
-                log_group_name = ${rCloudWatchLogsAgentGroup}
-                log_stream_name = {instance_id}/bgpd.log
-                datetime_format =
+                {
+                  "metrics": {
+                    "metrics_collected": {
+                      "cpu": {
+                        "resources": [
+                          "*"
+                        ],
+                        "measurement": [
+                          "usage_idle",
+                          "usage_nice",
+                          "usage_guest"
+                        ],
+                        "totalcpu": false,
+                        "metrics_collection_interval": 10
+                      },
+                      "mem": {
+                        "measurement": [
+                          "total",
+                          "used",
+                          "used_percent"
+                        ]
+                      },
+                      "swap": {
+                        "measurement": [
+                          "free",
+                          "used",
+                          "used_percent"
+                        ]
+                      },
+                      "netstat": {
+                        "measurement": [
+                          "tcp_established",
+                          "tcp_syn_sent",
+                          "tcp_close"
+                        ],
+                        "metrics_collection_interval": 60
+                      },
+                      "disk": {
+                        "measurement": [
+                          "total",
+                          "free",
+                          "used",
+                          "used_percent"
+                        ],
+                        "resources": [
+                          "*"
+                        ],
+                        "drop_device": true
+                      },  
+                      "processes": {
+                        "measurement": [
+                          "running",
+                          "sleeping",
+                          "dead"
+                        ]
+                      }
+                    },
+                    "append_dimensions": {
+                      "ImageId": "${!aws:ImageId}",
+                      "InstanceId": "${!aws:InstanceId}",
+                      "InstanceType": "${!aws:InstanceType}"
+                    },
+                    "aggregation_dimensions" : [["InstanceId", "InstanceType"],[]]
+                  },
+                  "logs": {
+                    "logs_collected": {
+                      "files": {
+                        "collect_list": [
+                          {
+                            "file_path": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log",
+                            "log_group_name": "amazon-cloudwatch-agent.log",
+                            "log_stream_name": "amazon-cloudwatch-agent.log",
+                            "timezone": "UTC"
+                          },
+                          {
+                            "file_path": "/var/log/cloud-init.log",
+                            "log_group_name": "${rCloudWatchLogsAgentGroup}",
+                            "log_stream_name": "{instance_id}/cloud-init.log",
+                            "timezone": "UTC"
+                          },
+                          {
+                            "file_path": "/var/log/cloud-init-output.log",
+                            "log_group_name": "${rCloudWatchLogsAgentGroup}",
+                            "log_stream_name": "{instance_id}/cloud-init-output.log",
+                            "timezone": "UTC"
+                          },
+                          {
+                            "file_path": "/var/log/cfn-init.log",
+                            "log_group_name": "${rCloudWatchLogsAgentGroup}",
+                            "log_stream_name": "{instance_id}/cfn-init.log",
+                            "timezone": "UTC"
+                          },
+                          {
+                            "file_path": "/var/log/cfn-wire.log",
+                            "log_group_name": "${rCloudWatchLogsAgentGroup}",
+                            "log_stream_name": "{instance_id}/cfn-wire.log",
+                            "timezone": "UTC"
+                          },
+                          {
+                            "file_path": "/var/log/charon.log",
+                            "log_group_name": "${rCloudWatchLogsAgentGroup}",
+                            "log_stream_name": "{instance_id}/charon.log",
+                            "timezone": "UTC"
+                          },
+                          {
+                            "file_path": "/var/log/quagga/zebra.log",
+                            "log_group_name": "${rCloudWatchLogsAgentGroup}",
+                            "log_stream_name": "{instance_id}/zebra.log",
+                            "timezone": "UTC"
+                          },
+                          {
+                            "file_path": "/var/log/quagga/bgpd.log",
+                            "log_group_name": "${rCloudWatchLogsAgentGroup}",
+                            "log_stream_name": "{instance_id}/bgpd.log",
+                            "timezone": "UTC"
+                          }
+                        ]
+                      }
+                    },
+                    "log_stream_name": "${rCloudWatchLogsAgentGroup}",
+                    "force_flush_interval" : 15
+                  }
+                }
               mode: '000444'
               owner: root
               group: root
-            /etc/awslogs/awscli.conf:
-              content: !Sub |
-                [plugins]
-                cwlogs = cwlogs
-                [default]
-                region = ${AWS::Region}
-              mode: '000444'
-              owner: root
-              group: root
+        02-restart-cloudwatch-agent:
           commands:
-            01-create-awslogs-state-file:
-              command: mkdir -p /var/awslogs/state
-            02-enable-awslogsd:
-              command: systemctl enable awslogsd.service
-            03-start-awslogsd:
-              command: systemctl start awslogsd
-        03-InstallEpel:
+            01-stop-service:
+              command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a stop
+            02-start-service:
+              command: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+        03-install-epel:
           commands:
             01-install-epel:
               command: amazon-linux-extras install epel -y
-        04-ConfigureVpnGatewayConfig:
+        04-config-vpn-gateway-config:
           packages:
             yum:
               strongswan: []
@@ -735,7 +779,7 @@ Resources:
               mode: '000600'
               owner: root
               group: root
-        05-ConfigureVpnGatewaySecretsPsk:
+        05-config-vpn-gateway-secrets-psk:
           files:
             /etc/strongswan/ipsec.secrets:
               content: !Sub |
@@ -775,7 +819,7 @@ Resources:
             00-set-psk:
               command: >- 
                 /tmp/set-psk.sh
-        05-ConfigureVpnGatewayCertFiles:
+        05-config-vpn-gateway-cert-files:
           files:
             /etc/strongswan/ipsec.d/cacerts/root-ca.pem: 
               source: !Sub "https://${pCertBucket}.s3.${AWS::Region}.amazonaws.com/${pRootCaCert}"
@@ -828,7 +872,7 @@ Resources:
             00-set-private-key-passphrase:
               command: >- 
                 /tmp/set-passphrase.sh
-        06-ConfigureVpnGatewayCommands:
+        06-config-vpn-gateway-commands:
           commands:
             00-sed-instance-specific-settings:
               command: >- 
@@ -975,4 +1019,4 @@ Resources:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub '/${pSystem}/${pApp}/ec2/${pEnvPurpose}'
-      RetentionInDays: 1
+      RetentionInDays: 30
