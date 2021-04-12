@@ -151,7 +151,7 @@ Each of the AWS Secrets Manager secrets for the PSK values must be in the form o
 
 ### 4. Deploy VPN Gateway Stack
 
-In this step you'll create a CloudFormation stack using the [`vpn-gateway-strongswan.yml`](https://raw.githubusercontent.com/aws-samples/vpn-gateway-strongwswan/master/vpn-gateway-strongswan.yml) template and configuration data obtained from the remote site's Site-to-Site VPN Connection resource.
+In this step you'll create a CloudFormation stack using the [`vpn-gateway-strongswan.yml`](vpn-gateway-strongswan.yml) template and configuration data obtained from the remote site's Site-to-Site VPN Connection resource.
 
 You can use either the AWS management console or an included helper script and the AWS CLI to create the stack.  Given the number of parameters involved, you will probably find it easier to use the CLI so that you can specify the parameter values once in a JSON file as opposed to entering them via the AWS management console. Using the CLI approach also makes it easier to spin up new stack instances both in cases where failures occur and you want to change settings to experiment with features.
 
@@ -164,7 +164,7 @@ Use the CloudFormation template to deploy a VPN gateway stack in an appropriate 
 1. Select "Create Stack" and select "With new resources".
 1. Select "Upload a template file"
 
-1. Use your browser to download the [`vpn-gateway-strongswan.yml`](https://raw.githubusercontent.com/aws-samples/vpn-gateway-strongwswan/master/vpn-gateway-strongswan.yml) CloudFormation template file to your local computer.
+1. Use your browser to download the [`vpn-gateway-strongswan.yml`](vpn-gateway-strongswan.yml) CloudFormation template file to your local computer.
 1. Select "Choose file" to select the CloudFormation template file that you downloaded.
 1. Select "Next" to "Specify stack details".
 1. Enter a name for your new CloudFormation stack. For example, "vpn-gateway".
