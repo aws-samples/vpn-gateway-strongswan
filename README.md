@@ -408,7 +408,7 @@ C>* 169.254.227.236/30 is directly connected, vti2
 
 If you need to change resources that are configured outside of the `UserData` and `Metadata` sections of the `AWS::EC2::LaunchTemplate`, you should be able to update either the template or stack parameters and update the stack in place.
 
-Until the `AWS::EC2::LaunchTemplate` is modified to support stack updates (see `TODO.md`), any changes in the `UserData` and `Metadata` sections of that resource require replacement of the stack.
+Until the `AWS::EC2::LaunchTemplate` is modified to support stack updates, any changes in the `UserData` and `Metadata` sections of that resource require replacement of the stack.
 
 ### Replacing a VPN Gateway Stack
 
@@ -474,7 +474,6 @@ num  target     prot opt source               destination
 
 $ sudo iptables -t nat -D POSTROUTING 1
 ```
-See [TODO.md](./TODO.md) for an entry calling for the optional automation of source IP masking.
 
 ## Contributing
 
