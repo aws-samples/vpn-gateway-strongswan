@@ -376,7 +376,7 @@ Resources:
             AssociatePublicIpAddress: !Ref pUseElasticIp
         UserData:
           Fn::Base64: !Sub |
-            #!/bin/bash -xe
+            #!/bin/bash -x
 
             yum install -y amazon-cloudwatch-agent
 
