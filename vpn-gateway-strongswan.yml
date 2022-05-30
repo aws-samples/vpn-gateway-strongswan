@@ -18,9 +18,12 @@ Metadata:
       Parameters:
       - pEnvPurpose
     - Label:
-        default: Authentication
+        default: Authentication Type
       Parameters:
       - pAuthType
+    - Label:
+        default: Common Parameters for Certificate-Based Authentication
+      Parameters:
       - pCertBucket
       - pCgwCert
       - pCgwPrivateKey
@@ -555,7 +558,6 @@ Resources:
           packages:
             yum:
               strongswan: []
-              ntp: []
               quagga: []
               jq: []
           files:
@@ -888,19 +890,15 @@ Resources:
                 sysctl -w net.ipv4.ip_forward=1 && 
                 sysctl -w net.ipv4.conf.eth0.disable_xfrm=1 && 
                 sysctl -w net.ipv4.conf.eth0.disable_policy=1
-            03-enable-start-ntpd:
-              command: >- 
-                systemctl enable ntpd && 
-                systemctl start  ntpd
-            04-enable-start-strongswan:
+            03-enable-start-strongswan:
               command: >- 
                 systemctl enable strongswan && 
                 systemctl start  strongswan
-            05-enable-start-zebra:
+            04-enable-start-zebra:
               command: >- 
                 systemctl enable zebra && 
                 systemctl start  zebra
-            06-enable-start-bgpd:
+            05-enable-start-bgpd:
               command: >- 
                 systemctl enable bgpd && 
                 systemctl start  bgpd
@@ -938,13 +936,13 @@ Resources:
     Properties: 
       Handle: 
         Ref: rVpnGatewayWaitHandle
-      Timeout: '300'
+      Timeout: '600'
       Count: 1
 
   rRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub '${pOrg}-${pSystem}-${pApp}-${pEnvPurpose}-svc-cloud-watch-ssm'
+      RoleName: !Sub '${pOrg}-${pSystem}-${pApp}-${pEnvPurpose}-${AWS::Region}-svc-cloud-watch-ssm'
       Path: !Sub '/${pOrg}/${pSystem}/${pApp}/'
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -1010,7 +1008,7 @@ Resources:
   rInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
-      InstanceProfileName: !Sub '${pSystem}-${pApp}-${pEnvPurpose}'
+      InstanceProfileName: !Sub '${pSystem}-${pApp}-${pEnvPurpose}-${AWS::Region}'
       Path: !Sub '/${pOrg}/${pSystem}/${pApp}/'
       Roles:
         - !Ref rRole
