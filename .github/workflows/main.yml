@@ -14,8 +14,11 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      
+    - name: Setup Cloud Formation Linter with Latest Version
+      uses: scottbrenner/cfn-lint-action@v2
 
-    - name: cfn-lint
-      uses: scottbrenner/cfn-lint-action@master
-      with:
-        args: "**/*.yml"
+    - name: Print the Cloud Formation Linter Version & run Linter.
+      run: |
+        cfn-lint --version
+        cfn-lint -t ./vpn-gateway-strongswan.yml 
