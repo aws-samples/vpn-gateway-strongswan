@@ -70,7 +70,7 @@ The following instructions are primarily oriented toward the first use case and 
 
 ### 1. Determine authentication approach
 
-This template supports pre-shared key- and certificate-based authentication.  
+This template supports pre-shared key-based and certificate-based authentication.  
 
 ### 1a. Pre-Shared Key-Based Authentication
 
